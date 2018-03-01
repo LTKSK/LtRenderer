@@ -15,17 +15,19 @@ namespace LtRenderer{
 		Vec3 result = Vec3(0.0);
 		Ray scatterd_ray = Ray(ray.origin(), ray.direction());
 		float russian_roulette_probability = 1.0f;
+		const std::string nee_mat_name = "Lambertion";
 		int depth = 0;
 		while (true) 
 		{
 			Intersection intersection;
 			if (!scene.bvhIntersectScene(scatterd_ray, &intersection))
 			{
+				// TODO IBL sampling
 				break;
 			}
 			else
 			{
-				if (typeid(intersection.material()) == typeid(LtRenderer::Lambertion))
+				if (intersection.material()->materialType() == nee_mat_name)
 				{
 					result += attenuation * scene.nextEventEstimation(&intersection, random);
 				}
@@ -34,8 +36,8 @@ namespace LtRenderer{
 				float russian_roulette_probability = max(intersection.material()->albedo().x(),
 														 max(intersection.material()->albedo().y(),
 															 intersection.material()->albedo().z()));
-				//keep_depth‚ð’´‚¦‚È‚¢ŠÔ‚ÌÄ‹A‚Í•ÛØB
-				//’´‚¦‚½ê‡‚Írussian_roulette_probability‚Æ—”‚ð”äŠr‚µ‚Äˆ—‚ð‘±‚¯‚é‚©Œˆ‚ß‚é
+				// keep_depth‚ð’´‚¦‚È‚¢ŠÔ‚ÌÄ‹A‚Í•ÛØ
+				// ’´‚¦‚½ê‡‚Írussian_roulette_probability‚Æ—”‚ð”äŠr‚µ‚Äˆ—‚ð‘±‚¯‚é‚©Œˆ‚ß‚é
 				if (depth > keep_depth)
 				{
 					if (random->zeroToOneFloat() >= russian_roulette_probability)
@@ -66,7 +68,7 @@ int main(int argc, char** argv)
 {
 	int width   = 640;
 	int height  = 480;
-	int samples = 128;
+	int samples = 1024;
 
 	std::cout << "P3\n" << width << " " << height << "\n255\n";
 

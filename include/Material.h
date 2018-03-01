@@ -11,6 +11,7 @@ class Material
 protected:
 	Vec3 albedo_;
 	Vec3 emission_;
+
 	inline Vec3 orientingNormal(Ray ray, Vec3 normal) const
 	{
 		return dot(normal, ray.direction()) < 0.0 ? normal : -normal;
@@ -36,10 +37,12 @@ public:
 	}
 	// ”½ŽË‚µ‚½Ray‚ð•Ô‚·ŠÖ”.•›ì—p‚Æ‚µ‚ÄAattenuation‚à“¯Žž‚ÉŒvŽZ‚·‚é
 	virtual Ray scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, Vec3& attenuation, Random* random) const = 0;
+	virtual std::string materialType() const = 0;
 };
 
 class Lambertion : public Material
 {
+	const std::string material_type_ = "Lambertion";
 public:
 	Lambertion(Vec3& albedo, Vec3& emission) : Material(albedo, emission) {}
 	~Lambertion(){}
@@ -67,10 +70,15 @@ public:
 		attenuation *= albedo_;
 		return Ray(hit_position, diffuse_direction);
 	}
+	std::string materialType() const
+	{
+		return material_type_;
+	}
 };
 
 class Metal : public Material
 {
+	const std::string material_type_ = "Metal";
 public:
 	Metal(Vec3& albedo, Vec3& emission) : Material(albedo, emission){}
 	Ray scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, Vec3& attenuation, Random* random) const
@@ -79,12 +87,16 @@ public:
 		attenuation *= albedo_;
 		return Ray(hit_position, reflect_direction);
 	}
+	std::string materialType() const
+	{
+		return material_type_;
+	}
 };
 
 class Dielectric : public Material
 {
 	float ior_;
-
+	const std::string material_type_ = "Dierectric";
 public:
 	Dielectric(Vec3& albedo, Vec3& emission, float ior) : Material(albedo, emission), ior_(ior){}
 	
@@ -127,6 +139,10 @@ public:
 		attenuation *= albedo_ *tr / (1.0 - prob);
 		Vec3 refract_direction = (ray.direction() * ior_ratio) - (orienting_normal * (ior_ratio * dot_dn + sqrt(D)));
 		return Ray(hit_position, normalize(refract_direction));
+	}
+	std::string materialType() const
+	{
+		return material_type_;
 	}
 };
 

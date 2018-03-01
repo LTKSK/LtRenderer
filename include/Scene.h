@@ -9,12 +9,14 @@ namespace LtRenderer
 class Scene
 {
 	std::vector<Mesh *> objects;
+	std::vector<Mesh *> light_objects_;
 	BVHTree* bvh_tree_;
 public:
 	Scene()
 	{
 		//light object
 		objects.push_back(new Sphere(Vec3(50.0, 16.5, 100.0), 8.5, new Lambertion(Vec3(0.0), Vec3(7.0))));
+		objects.push_back(new Sphere(Vec3(10.0, 100, 100.0), 8.5, new Lambertion(Vec3(0.0), Vec3(12.0))));
 		//上
 		objects.push_back(new Triangle(Vec3(0, 100, -50), Vec3(100, 100, -50), Vec3(0, 100, 200), new Lambertion(Vec3(0.8, 0.3, 0.3), Vec3())));
 		objects.push_back(new Triangle(Vec3(0, 100, 200), Vec3(100, 100, -50), Vec3(100, 100, 200), new Lambertion(Vec3(0.8, 0.3, 0.3), Vec3())));
@@ -40,6 +42,14 @@ public:
 		printf("BVH Build start\n");
 		bvh_tree_->build(objects);
 		printf("BVH Build end\n\n");
+
+		for (auto obj : objects)
+		{
+			if (obj->material()->isEmissive())
+			{
+				light_objects_.push_back(obj);
+			}
+		}
 	}
 
 	~Scene()
@@ -49,9 +59,10 @@ public:
 		delete bvh_tree_;
 	}
 
-	const auto light_object()
+	const auto light_object(Random* random)
 	{
-		return objects[0];
+		int random_index = random->randomUint() % light_objects_.size();
+		return light_objects_[random_index];
 	}
 
 	inline bool intersectScene(const Ray& ray, Intersection* intersection)
@@ -72,10 +83,22 @@ public:
 		return bvh_tree_->intersect(ray, intersection);
 	}
 
+	Vec3 samplingIBL()
+	{
+		return Vec3();
+	}
+
+	Vec3 samplingLightArea()
+	{
+		//ランダムなオブジェクトを一つ選んで
+		//そのオブジェクトの表面上の点をランダムサンプリングする
+		return Vec3();
+	}
+
 	Vec3 nextEventEstimation(const Intersection* intersection, Random* random)
 	{
 		// TODO: ここを整理する
-		const auto& light = light_object();
+		const auto& light = light_object(random);
 		const auto  light_pos = light->randomPoint(random);
 
 		// ライトベクトル.
@@ -105,13 +128,16 @@ public:
 			Intersection nee_intersection;
 			const bool is_hit = bvhIntersectScene(shadow_ray, &nee_intersection);
 			// ライトのみと衝突した場合のみ寄与を取る.
-			// TODO lightの判定は数値ではなくclassのtypeなどで判別するように
 			if (is_hit && nee_intersection.material()->isEmissive())
 			{
-				//距離の二乗に反比例
+				//距離の二乗に反比例する減衰
 				auto G = dot0 * dot1 / light_dist2;
 				return nee_intersection.material()->emission() * (intersection->material()->albedo() / F_PI) * G / light->pdf();
 			}
+		}
+		else
+		{
+			//TODO IBL sampling
 		}
 		return Vec3();
 	}

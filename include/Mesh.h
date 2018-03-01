@@ -39,6 +39,7 @@ public:
 		float min_y = center.y() - radius;
 		float min_z = center.z() - radius;
 		bounding_box_ = new AABB(Vec3(max_x, max_y, max_z), Vec3(min_x, min_y, min_z));
+		//ï\ñ êœï™ÇÃ1
 		pdf_value_ = 1.0 / (4.0 * F_PI * radius * radius);
 	}
 	~Sphere()
@@ -72,7 +73,7 @@ public:
 		const auto r1 = F_PI * 2.0f * random->zeroToOneFloat();
 		const auto r2 = random->zeroToOneFloat();
 		const auto r2s = sqrt(r2);
-		return position_ + (10.0 + F_HIT_MIN) * Vec3(sqrt(1.0 - r2 * r2) * cos(r1), sqrt(1.0 - r2 * r2) * sin(r1), r2);
+		return position_ + (radius_ + F_HIT_MIN) * Vec3(sqrt(1.0 - r2 * r2) * cos(r1), sqrt(1.0 - r2 * r2) * sin(r1), r2);
 	}
 
 	inline bool intersect(const Ray& ray, Intersection *intersection) const
@@ -117,6 +118,7 @@ class Triangle : public Mesh
 	Vec3 edge_ab_, edge_ac_;
 	Material* material_;
 	AABB* bounding_box_;
+	float pdf_value_;
 
 public:
 	Triangle() : Mesh() {};
@@ -148,6 +150,9 @@ public:
 
 		Vec3 cross_vec = cross(edge_ab_, edge_ac_);
 		normal_ = normalize(cross_vec);
+
+		//ï\ñ êœï™ÇÃ1.TODO
+		pdf_value_ = 1.0f;
 	};
 	~Triangle()
 	{
@@ -172,7 +177,7 @@ public:
 
 	float pdf() const
 	{
-		return 0.0f;
+		return pdf_value_;
 	}
 
 	Vec3 randomPoint(Random* random) const
