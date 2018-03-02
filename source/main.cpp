@@ -68,7 +68,7 @@ int main(int argc, char** argv)
 {
 	int width   = 640;
 	int height  = 480;
-	int samples = 1024;
+	int samples = 64;
 
 	std::cout << "P3\n" << width << " " << height << "\n255\n";
 

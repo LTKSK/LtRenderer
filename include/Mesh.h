@@ -18,14 +18,14 @@ public:
 	virtual inline Material* material() const = 0;
 	virtual inline AABB* boundingBox() const = 0;
 	virtual inline Vec3 randomPoint(Random* random) const = 0;
-	virtual float pdf() const = 0;
+	virtual float surfaceArea() const = 0;
 };
 
 class Sphere : public Mesh
 {
 	Vec3 position_;
 	float radius_;
-	float pdf_value_;
+	float surface_area_;
 	Material* material_;
 	AABB* bounding_box_;
 public:
@@ -39,8 +39,7 @@ public:
 		float min_y = center.y() - radius;
 		float min_z = center.z() - radius;
 		bounding_box_ = new AABB(Vec3(max_x, max_y, max_z), Vec3(min_x, min_y, min_z));
-		//ï\ñ êœï™ÇÃ1
-		pdf_value_ = 1.0 / (4.0 * F_PI * radius * radius);
+		surface_area_ =  (4.0 * F_PI * radius * radius);
 	}
 	~Sphere()
 	{
@@ -63,9 +62,9 @@ public:
 		return position_;
 	}
 
-	float pdf() const
+	float surfaceArea() const
 	{
-		return pdf_value_;
+		return surface_area_;
 	}
 
 	Vec3 randomPoint(Random* random) const
@@ -118,7 +117,7 @@ class Triangle : public Mesh
 	Vec3 edge_ab_, edge_ac_;
 	Material* material_;
 	AABB* bounding_box_;
-	float pdf_value_;
+	float surface_area_;
 
 public:
 	Triangle() : Mesh() {};
@@ -150,9 +149,7 @@ public:
 
 		Vec3 cross_vec = cross(edge_ab_, edge_ac_);
 		normal_ = normalize(cross_vec);
-
-		//ï\ñ êœï™ÇÃ1.TODO
-		pdf_value_ = 1.0f;
+		surface_area_ = cross_vec.length() / 2.0f;
 	};
 	~Triangle()
 	{
@@ -175,9 +172,9 @@ public:
 		return position_;
 	}
 
-	float pdf() const
+	float surfaceArea() const
 	{
-		return pdf_value_;
+		return surface_area_;
 	}
 
 	Vec3 randomPoint(Random* random) const
