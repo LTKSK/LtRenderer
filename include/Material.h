@@ -68,7 +68,7 @@ public:
 		Vec3 diffuse_direction = normalize(u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1.0 - r2));
 
 		attenuation *= albedo_;
-		return Ray(hit_position, diffuse_direction);
+		return Ray(hit_position + diffuse_direction*0.01f, diffuse_direction);
 	}
 	std::string materialType() const
 	{
@@ -83,9 +83,9 @@ public:
 	Metal(Vec3& albedo, Vec3& emission) : Material(albedo, emission){}
 	Ray scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, Vec3& attenuation, Random* random) const
 	{
-		Vec3 reflect_direction = reflect(ray.direction(), normal);
+		Vec3 reflect_direction = normalize(reflect(ray.direction(), normal));
 		attenuation *= albedo_;
-		return Ray(hit_position, reflect_direction);
+		return Ray(hit_position+reflect_direction * 0.01f, reflect_direction);
 	}
 	std::string materialType() const
 	{
@@ -114,8 +114,8 @@ public:
 		if (D < 0.0)
 		{
 			attenuation *= albedo_;
-			Vec3 reflect_direction = reflect(ray.direction(), orienting_normal);
-			return Ray(hit_position, normalize(reflect_direction));
+			Vec3 reflect_direction = normalize(reflect(ray.direction(), orienting_normal));
+			return Ray(hit_position + reflect_direction * 0.01f, reflect_direction);
 		}
 
 		//schlickの近似を用いて、屈折光の運ぶ光の割合を求める
@@ -132,13 +132,13 @@ public:
 		{
 			//反射方向のサンプリング
 			attenuation *= albedo_ * re / prob;
-			Vec3 refrect_direction = reflect(ray.direction(), orienting_normal);
-			return Ray(hit_position, normalize(refrect_direction));
+			Vec3 reflect_direction = normalize(reflect(ray.direction(), orienting_normal));
+			return Ray(hit_position + reflect_direction * 0.01f, reflect_direction);
 		}
 		//屈折方向のサンプリング
-		attenuation *= albedo_ *tr / (1.0 - prob);
-		Vec3 refract_direction = (ray.direction() * ior_ratio) - (orienting_normal * (ior_ratio * dot_dn + sqrt(D)));
-		return Ray(hit_position, normalize(refract_direction));
+		attenuation *= albedo_ * tr / (1.0 - prob);
+		Vec3 refract_direction = normalize((ray.direction() * ior_ratio) - (orienting_normal * (ior_ratio * dot_dn + sqrt(D))));
+		return Ray(hit_position + refract_direction * 0.01f, refract_direction);
 	}
 	std::string materialType() const
 	{
