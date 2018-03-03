@@ -68,7 +68,7 @@ int main(int argc, char** argv)
 {
 	int width   = 640;
 	int height  = 480;
-	int samples = 1024;
+	int samples = 128;
 
 	std::cout << "P3\n" << width << " " << height << "\n255\n";
 
@@ -78,15 +78,17 @@ int main(int argc, char** argv)
 												   LtRenderer::Vec3(0.0, 1.0, 0.0),
 												   float(width) / float(height),
 												   130.0);
-	
+	std::vector<LtRenderer::Vec3> image;
+	image.resize(width * height);
+
 	float invert_gamma = 1.0 / LtRenderer::GAMMA_VALUE;
+#pragma omp parallel for schedule(dynamic, 1) num_threads(4)
 	for (int y = 0; y < height; ++y)
 	{ 
 		LtRenderer::Random random(y+1);
 		for (int x = 0; x < width; ++x)
 		{
 			LtRenderer::Vec3 col = LtRenderer::Vec3(0.0);
-#pragma omp parallel for schedule(dynamic, 1) num_threads(4)
 			for (int sample = 0; sample < samples; ++sample)
 			{
 				float u = (float(x) + random.zeroToOneFloat()) / float(width) - 0.5;
@@ -100,10 +102,15 @@ int main(int argc, char** argv)
 			col = LtRenderer::Vec3(LtRenderer::saturate(pow(col.x(), invert_gamma)), 
 								   LtRenderer::saturate(pow(col.y(), invert_gamma)), 
 								   LtRenderer::saturate(pow(col.z(), invert_gamma)));
-			int image_r = int(255.99*col.x());
-			int image_g = int(255.99*col.y());
-			int image_b = int(255.99*col.z());
-			std::cout << image_r << " " << image_g << " " << image_b << " ";
+			
+			int pixel_id = y * width + x;
+			image[pixel_id] = LtRenderer::Vec3(int(255.99*col.x()),
+										       int(255.99*col.y()),
+										       int(255.99*col.z()));
 		}
+	}
+	for (auto pixel : image)
+	{
+		std::cout << pixel.x() << " " << pixel.y() << " " << pixel.z() << " ";
 	}
 }
