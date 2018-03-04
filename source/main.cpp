@@ -82,7 +82,7 @@ int main(int argc, char** argv)
 	image.resize(width * height);
 
 	double invert_gamma = 1.0 / LtRenderer::GAMMA_VALUE;
-#pragma omp parallel for schedule(dynamic, 1) num_threads(7)
+#pragma omp parallel for schedule(dynamic, 1) num_threads(4)
 	for (int y = 0; y < height; ++y)
 	{ 
 		LtRenderer::Random random(y+1);

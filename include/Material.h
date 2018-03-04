@@ -9,8 +9,8 @@ namespace LtRenderer
 class Material
 {
 protected:
-	Vec3 albedo_;
-	Vec3 emission_;
+	Vec3 _albedo;
+	Vec3 _emission;
 
 	inline Vec3 orientingNormal(Ray ray, Vec3 normal) const
 	{
@@ -18,22 +18,22 @@ protected:
 	}
 
 public:
-	Material(Vec3& albedo, Vec3& emission): albedo_(albedo), emission_(emission){}
+	Material(Vec3& albedo, Vec3& emission): _albedo(albedo), _emission(emission){}
 	~Material(){}
 	
 	bool isEmissive()
 	{
-		return emission_.x() > 0.0 || emission_.y() > 0.0 || emission_.z() > 0.0;
+		return _emission.x() > 0.0 || _emission.y() > 0.0 || _emission.z() > 0.0;
 	}
 
 	Vec3 albedo()
 	{
-		return albedo_;
+		return _albedo;
 	}
 
 	Vec3 emission()
 	{
-		return emission_;
+		return _emission;
 	}
 	// 反射したRayを返す関数.副作用として、attenuationも同時に計算する
 	virtual Ray scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, Vec3& attenuation, Random* random) const = 0;
@@ -42,7 +42,7 @@ public:
 
 class Lambertion : public Material
 {
-	const std::string material_type_ = "Lambertion";
+	const std::string _material_type = "Lambertion";
 public:
 	Lambertion(Vec3& albedo, Vec3& emission) : Material(albedo, emission) {}
 	~Lambertion(){}
@@ -67,38 +67,38 @@ public:
 
 		Vec3 diffuse_direction = normalize(u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1.0 - r2));
 
-		attenuation *= albedo_;
+		attenuation *= _albedo;
 		return Ray(hit_position + diffuse_direction*0.01f, diffuse_direction);
 	}
 	std::string materialType() const
 	{
-		return material_type_;
+		return _material_type;
 	}
 };
 
 class Metal : public Material
 {
-	const std::string material_type_ = "Metal";
+	const std::string _material_type = "Metal";
 public:
 	Metal(Vec3& albedo, Vec3& emission) : Material(albedo, emission){}
 	Ray scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, Vec3& attenuation, Random* random) const
 	{
 		Vec3 reflect_direction = normalize(reflect(ray.direction(), normal));
-		attenuation *= albedo_;
+		attenuation *= _albedo;
 		return Ray(hit_position+reflect_direction * 0.01f, reflect_direction);
 	}
 	std::string materialType() const
 	{
-		return material_type_;
+		return _material_type;
 	}
 };
 
 class Dielectric : public Material
 {
-	double ior_;
-	const std::string material_type_ = "Dierectric";
+	double _ior;
+	const std::string _material_type = "Dierectric";
 public:
-	Dielectric(Vec3& albedo, Vec3& emission, double ior) : Material(albedo, emission), ior_(ior){}
+	Dielectric(Vec3& albedo, Vec3& emission, double ior) : Material(albedo, emission), _ior(ior){}
 	
 	Ray scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, Vec3& attenuation, Random* random) const
 	{
@@ -106,20 +106,20 @@ public:
 		Vec3 orienting_normal = dot(normal, ray.direction()) < 0.0 ? normal : -normal;
 		bool into = dot(normal, orienting_normal) > 0.0;
 		double air_ior = 1.0;
-		double ior_ratio = into ? air_ior / ior_ : ior_ / air_ior;
+		double ior_ratio = into ? air_ior / _ior : _ior / air_ior;
 		double dot_dn = dot(ray.direction(), orienting_normal);
 		double D = 1.0 - ior_ratio * ior_ratio * (1.0 - dot_dn * dot_dn);
 
 		//Dが0.0より小さい場合、屈折後のベクトルとnormalの角度が90を超えているので全反射として扱う
 		if (D < 0.0)
 		{
-			attenuation *= albedo_;
+			attenuation *= _albedo;
 			Vec3 reflect_direction = normalize(reflect(ray.direction(), orienting_normal));
 			return Ray(hit_position + reflect_direction * 0.01f, reflect_direction);
 		}
 
 		//schlickの近似を用いて、屈折光の運ぶ光の割合を求める
-		double f0 = pow2((ior_ - air_ior) / (ior_ + air_ior));
+		double f0 = pow2((_ior - air_ior) / (_ior + air_ior));
 		double cosine = into ? -dot_dn : dot(ray.direction(), normal);
 		double re = f0 + (1 - f0) * pow5(1 - cosine);
 		double reflect_prob = 1.0 - re;
@@ -131,18 +131,18 @@ public:
 		if (prob > random->zeroToOneFloat())
 		{
 			//反射方向のサンプリング
-			attenuation *= albedo_ * re / prob;
+			attenuation *= _albedo * re / prob;
 			Vec3 reflect_direction = normalize(reflect(ray.direction(), orienting_normal));
 			return Ray(hit_position + reflect_direction * 0.01f, reflect_direction);
 		}
 		//屈折方向のサンプリング
-		attenuation *= albedo_ * tr / (1.0 - prob);
+		attenuation *= _albedo * tr / (1.0 - prob);
 		Vec3 refract_direction = normalize((ray.direction() * ior_ratio) - (orienting_normal * (ior_ratio * dot_dn + sqrt(D))));
 		return Ray(hit_position + refract_direction * 0.01f, refract_direction);
 	}
 	std::string materialType() const
 	{
-		return material_type_;
+		return _material_type;
 	}
 };
 

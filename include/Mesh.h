@@ -23,14 +23,14 @@ public:
 
 class Sphere : public Mesh
 {
-	Vec3 position_;
-	double radius_;
-	double surface_area_;
-	Material* material_;
-	AABB* bounding_box_;
+	Vec3 _position;
+	double _radius;
+	double _surface_area;
+	Material* _material;
+	AABB* _bounding_box;
 public:
 	Sphere() {}
-	Sphere(Vec3 center, double radius, Material* material): position_(center), radius_(radius), material_(material)
+	Sphere(Vec3 center, double radius, Material* material): _position(center), _radius(radius), _material(material)
 	{
 		double max_x = center.x() + radius;
 		double max_y = center.y() + radius;
@@ -38,33 +38,33 @@ public:
 		double min_x = center.x() - radius;
 		double min_y = center.y() - radius;
 		double min_z = center.z() - radius;
-		bounding_box_ = new AABB(Vec3(max_x, max_y, max_z), Vec3(min_x, min_y, min_z));
-		surface_area_ =  (4.0 * D_PI * radius * radius);
+		_bounding_box = new AABB(Vec3(max_x, max_y, max_z), Vec3(min_x, min_y, min_z));
+		_surface_area =  (4.0 * D_PI * radius * radius);
 	}
 	~Sphere()
 	{
-		delete bounding_box_;
-		delete material_;
+		delete _bounding_box;
+		delete _material;
 	}
 	
 	Material* material() const
 	{
-		return material_;
+		return _material;
 	}
 
 	AABB* boundingBox() const
 	{
-		return bounding_box_;
+		return _bounding_box;
 	}
 
 	Vec3 position() const
 	{
-		return position_;
+		return _position;
 	}
 
 	double surfaceArea() const
 	{
-		return surface_area_;
+		return _surface_area;
 	}
 
 	Vec3 randomPoint(Random* random) const
@@ -72,14 +72,14 @@ public:
 		const auto r1 = D_PI * 2.0 * random->zeroToOneFloat();
 		const auto r2 = random->zeroToOneFloat();
 		const auto r2s = sqrt(r2);
-		return position_ + (radius_ + D_HIT_MIN) * Vec3(sqrt(1.0 - r2 * r2) * cos(r1), sqrt(1.0 - r2 * r2) * sin(r1), r2);
+		return _position + (_radius + D_HIT_MIN) * Vec3(sqrt(1.0 - r2 * r2) * cos(r1), sqrt(1.0 - r2 * r2) * sin(r1), r2);
 	}
 
 	inline bool intersect(const Ray& ray, Intersection *intersection) const
 	{
-		auto p = position_ - ray.origin();
+		auto p = _position - ray.origin();
 		auto b = dot(p, ray.direction());
-		auto det = b * b - dot(p, p) + radius_ * radius_;
+		auto det = b * b - dot(p, p) + _radius * _radius;
 		if (det >= 0.0)
 		{
 			auto sqrt_det = sqrt(det);
@@ -88,17 +88,17 @@ public:
 			//t1,t2のいずれかが、衝突時の値が判定値より大きく、なおかつ既にhitしている他のobjectより小さい場合にtrue
 			if (t1 > D_HIT_MIN && intersection->t >= t1)
 			{
-				intersection->setNormal(normalize(ray.pointAtParameter(t1) - position_));
+				intersection->setNormal(normalize(ray.pointAtParameter(t1) - _position));
 				intersection->setPosition(ray.pointAtParameter(t1));
-				intersection->setMaterial(material_);
+				intersection->setMaterial(_material);
 				intersection->t = t1;
 				return true;
 			}
 			if (t2 > D_HIT_MIN && intersection->t >= t2)
 			{
-				intersection->setNormal(normalize(ray.pointAtParameter(t2) - position_));
+				intersection->setNormal(normalize(ray.pointAtParameter(t2) - _position));
 				intersection->setPosition(ray.pointAtParameter(t2));
-				intersection->setMaterial(material_);
+				intersection->setMaterial(_material);
 				intersection->t = t2;
 				return true;
 			}
@@ -109,15 +109,15 @@ public:
 
 class Triangle : public Mesh
 {
-	Vec3 position_;
-	Vec3 normal_;
-	Vec3 vertex_a_, vertex_b_, vertex_c_;
-	Vec3 color_;
-	Vec3 emission_;
-	Vec3 edge_ab_, edge_ac_;
-	Material* material_;
-	AABB* bounding_box_;
-	double surface_area_;
+	Vec3 _position;
+	Vec3 _normal;
+	Vec3 _vertex_a, _vertex_b, _vertex_c;
+	Vec3 _color;
+	Vec3 _emission;
+	Vec3 _edge_ab, _edge_ac;
+	Material* _material;
+	AABB* _bounding_box;
+	double _surface_area;
 
 public:
 	Triangle() : Mesh() {};
@@ -125,62 +125,62 @@ public:
 			 const Vec3& vertex_b,
 			 const Vec3& vertex_c,
 			 Material* material) :
-		vertex_a_(vertex_a),
-		vertex_b_(vertex_b),
-		vertex_c_(vertex_c),
-		material_(material)
+		_vertex_a(vertex_a),
+		_vertex_b(vertex_b),
+		_vertex_c(vertex_c),
+		_material(material)
 	{
-		edge_ab_ = vertex_b_ - vertex_a_;
-		edge_ac_ = vertex_c_ - vertex_a_;
+		_edge_ab = _vertex_b - _vertex_a;
+		_edge_ac = _vertex_c - _vertex_a;
 
-		position_ = Vec3((vertex_a_.x() + vertex_b_.x() + vertex_c_.x()) / 3,
-						 (vertex_a_.y() + vertex_b_.y() + vertex_c_.y()) / 3,
-						 (vertex_a_.z() + vertex_b_.z() + vertex_c_.z()) / 3);
+		_position = Vec3((_vertex_a.x() + _vertex_b.x() + _vertex_c.x()) / 3,
+						 (_vertex_a.y() + _vertex_b.y() + _vertex_c.y()) / 3,
+						 (_vertex_a.z() + _vertex_b.z() + _vertex_c.z()) / 3);
 
 		//三角形を構成する3頂点の各軸の最大最小からAABBを構築する
-		double max_x = std::fmax(vertex_a_.x(), std::fmax(vertex_b_.x(), vertex_c_.x()));
-		double max_y = std::fmax(vertex_a_.y(), std::fmax(vertex_b_.y(), vertex_c_.y()));
-		double max_z = std::fmax(vertex_a_.z(), std::fmax(vertex_b_.z(), vertex_c_.z()));
-		double min_x = std::fmin(vertex_a_.x(), std::fmin(vertex_b_.x(), vertex_c_.x()));
-		double min_y = std::fmin(vertex_a_.y(), std::fmin(vertex_b_.y(), vertex_c_.y()));
-		double min_z = std::fmin(vertex_a_.z(), std::fmin(vertex_b_.z(), vertex_c_.z()));
-		bounding_box_ = new AABB(Vec3(max_x, max_y, max_z),
+		double max_x = std::fmax(_vertex_a.x(), std::fmax(_vertex_b.x(), _vertex_c.x()));
+		double max_y = std::fmax(_vertex_a.y(), std::fmax(_vertex_b.y(), _vertex_c.y()));
+		double max_z = std::fmax(_vertex_a.z(), std::fmax(_vertex_b.z(), _vertex_c.z()));
+		double min_x = std::fmin(_vertex_a.x(), std::fmin(_vertex_b.x(), _vertex_c.x()));
+		double min_y = std::fmin(_vertex_a.y(), std::fmin(_vertex_b.y(), _vertex_c.y()));
+		double min_z = std::fmin(_vertex_a.z(), std::fmin(_vertex_b.z(), _vertex_c.z()));
+		_bounding_box = new AABB(Vec3(max_x, max_y, max_z),
 								 Vec3(min_x, min_y, min_z));
 
-		Vec3 cross_vec = cross(edge_ab_, edge_ac_);
-		normal_ = normalize(cross_vec);
-		surface_area_ = cross_vec.length() / 2.0;
+		Vec3 cross_vec = cross(_edge_ab, _edge_ac);
+		_normal = normalize(cross_vec);
+		_surface_area = cross_vec.length() / 2.0;
 	};
 	~Triangle()
 	{
-		delete bounding_box_;
-		delete material_;
+		delete _bounding_box;
+		delete _material;
 	};
 
 	Material* material() const
 	{
-		return material_;
+		return _material;
 	}
 
 	AABB* boundingBox() const
 	{
-		return bounding_box_;
+		return _bounding_box;
 	}
 
 	Vec3 position() const
 	{
-		return position_;
+		return _position;
 	}
 
 	double surfaceArea() const
 	{
-		return surface_area_;
+		return _surface_area;
 	}
 
 	Vec3 randomPoint(Random* random) const
 	{
 		const auto rnd = random->zeroToOneFloat();
-		return edge_ab_ * rnd + edge_ab_ * (1.0 - rnd);
+		return _edge_ab * rnd + _edge_ab * (1.0 - rnd);
 	}
 
 	//行列式算出関数
@@ -213,28 +213,28 @@ public:
 		Vec3 inv_raydir = normalize(Vec3(-ray.direction()));
 		//(a,b,c)この後の計算の共通分母になる部分.
 		//a,b,cで作られる体積で、この後出て来る体積を割って、uvtを求める
-		double denominator = det(edge_ab_, edge_ac_, inv_raydir);
+		double denominator = det(_edge_ab, _edge_ac, inv_raydir);
 		//レイが平面と並行でない場合
 		if (denominator > 0)
 		{
-			Vec3 vertex_a_pos = ray.origin() - vertex_a_;
+			Vec3 vertex_a_pos = ray.origin() - _vertex_a;
 
 			//(d,b,c)
-			double u = det(vertex_a_pos, edge_ac_, inv_raydir) / denominator;
+			double u = det(vertex_a_pos, _edge_ac, inv_raydir) / denominator;
 			//uが範囲外だったら何もしない
 			if (0.0 <= u && u <= 1.0)
 			{
 				//(a,d,c)
-				double v = det(edge_ab_, vertex_a_pos, inv_raydir) / denominator;
+				double v = det(_edge_ab, vertex_a_pos, inv_raydir) / denominator;
 				if (0.0 <= v && u + v <= 1.0)
 				{
 					//(a,b,d)
-					double t = det(edge_ab_, edge_ac_, vertex_a_pos) / denominator;
+					double t = det(_edge_ab, _edge_ac, vertex_a_pos) / denominator;
 					if (t < 0 || t > intersection->t)
 					{
 						return false;
 					}
-					intersection->setNormal(normal_);
+					intersection->setNormal(_normal);
 					intersection->setPosition(ray.pointAtParameter(t));
 					intersection->setMaterial(material());
 					intersection->t = t;

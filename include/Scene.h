@@ -9,9 +9,9 @@ namespace LtRenderer
 class Scene
 {
 	std::vector<Mesh *> objects;
-	std::vector<Mesh *> light_objects_;
-	BVHTree* bvh_tree_;
-	double pdf_;
+	std::vector<Mesh *> _light_objects;
+	BVHTree* _bvh_tree;
+	double _pdf;
 public:
 	Scene()
 	{
@@ -39,9 +39,9 @@ public:
 		objects.push_back(new Sphere(Vec3(40.0, 16.5, 147.0), 16.5, new Lambertion(Vec3(0.8, 0.8, 0.8), Vec3())));
 		objects.push_back(new Sphere(Vec3(73.0, 40.5, 100.0), 16.5, new Dielectric(Vec3(1.0), Vec3(), 1.5)));
 
-		bvh_tree_ = new BVHTree();
+		_bvh_tree = new BVHTree();
 		printf("BVH Build start\n");
-		bvh_tree_->build(objects);
+		_bvh_tree->build(objects);
 		printf("BVH Build end\n\n");
 
 		double light_area = 0.0;
@@ -49,24 +49,24 @@ public:
 		{
 			if (obj->material()->isEmissive())
 			{
-				light_objects_.push_back(obj);
+				_light_objects.push_back(obj);
 				light_area += obj->surfaceArea();
 			}
 		}
-		pdf_ = 1.0 / light_area;
+		_pdf = 1.0 / light_area;
 	}
 
 	~Scene()
 	{
 		objects.clear();
 		objects.shrink_to_fit();
-		delete bvh_tree_;
+		delete _bvh_tree;
 	}
 
 	const auto randomLightObject(Random* random)
 	{
-		int random_index = random->randomUint() % light_objects_.size();
-		return light_objects_[random_index];
+		int random_index = random->randomUint() % _light_objects.size();
+		return _light_objects[random_index];
 	}
 
 	inline bool intersectScene(const Ray& ray, Intersection* intersection)
@@ -84,7 +84,7 @@ public:
 
 	inline bool bvhIntersectScene(const Ray& ray, Intersection* intersection)
 	{
-		return bvh_tree_->intersect(ray, intersection);
+		return _bvh_tree->intersect(ray, intersection);
 	}
 
 	Vec3 samplingIBL()
@@ -133,7 +133,7 @@ public:
 			{
 				//‹——£‚Ì“ñæ‚É”½”ä—á‚·‚éŒ¸Š
 				auto G = dot0 * dot1 / light_dist2;
-				return nee_intersection.material()->emission() * (intersection->material()->albedo() / D_PI) * G * pdf_;
+				return nee_intersection.material()->emission() * (intersection->material()->albedo() / D_PI) * G * _pdf;
 			}
 		}
 		else

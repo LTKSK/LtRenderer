@@ -6,44 +6,44 @@ namespace LtRenderer
 
 class AABB
 {
-	Vec3 max_pos_;
-	Vec3 min_pos_;
+	Vec3 _max_pos;
+	Vec3 _min_pos;
 
 public:
 	AABB() 
 	{
-		max_pos_ = Vec3(-D_MAX);
-		min_pos_ = Vec3(D_MAX);
+		_max_pos = Vec3(-D_MAX);
+		_min_pos = Vec3(D_MAX);
 	}
-	AABB(const Vec3 &max_pos, const Vec3 &min_pos): max_pos_(max_pos), min_pos_(min_pos){}
+	AABB(const Vec3 &max_pos, const Vec3 &min_pos): _max_pos(max_pos), _min_pos(min_pos){}
 	~AABB() {}
 
 	inline void merge(const AABB* aabb)
 	{
-		max_pos_ = Vec3(std::fmax(aabb->max_pos_.x(), max_pos_.x()),
-						std::fmax(aabb->max_pos_.y(), max_pos_.y()),
-						std::fmax(aabb->max_pos_.z(), max_pos_.z()));
+		_max_pos = Vec3(std::fmax(aabb->_max_pos.x(), _max_pos.x()),
+						std::fmax(aabb->_max_pos.y(), _max_pos.y()),
+						std::fmax(aabb->_max_pos.z(), _max_pos.z()));
 
-		min_pos_ = Vec3(std::fmin(aabb->min_pos_.x(), min_pos_.x()),
-						std::fmin(aabb->min_pos_.y(), min_pos_.y()),
-						std::fmin(aabb->min_pos_.z(), min_pos_.z()));
+		_min_pos = Vec3(std::fmin(aabb->_min_pos.x(), _min_pos.x()),
+						std::fmin(aabb->_min_pos.y(), _min_pos.y()),
+						std::fmin(aabb->_min_pos.z(), _min_pos.z()));
 	}
 
 	inline bool contains(Ray& ray) const
 	{
-		return (ray.direction().x() >= min_pos_.x() && ray.direction().x() <= max_pos_.x() &&
-				ray.direction().y() >= min_pos_.y() && ray.direction().y() <= max_pos_.y() &&
-				ray.direction().z() >= min_pos_.z() && ray.direction().z() <= max_pos_.z());
+		return (ray.direction().x() >= _min_pos.x() && ray.direction().x() <= _max_pos.x() &&
+				ray.direction().y() >= _min_pos.y() && ray.direction().y() <= _max_pos.y() &&
+				ray.direction().z() >= _min_pos.z() && ray.direction().z() <= _max_pos.z());
 	}
 
 	Vec3 center() const
 	{
-		return (min_pos_ + max_pos_) * 0.5;
+		return (_min_pos + _max_pos) * 0.5;
 	}
 
 	Vec3 size() const
 	{
-		return max_pos_ - min_pos_;
+		return _max_pos - _min_pos;
 	}
 
 	double surfaceArea() const
@@ -63,8 +63,8 @@ public:
 		double t_near, t_far;
 		
 		double one_devide_dir = 1.0 / dir.x();
-		double t1 = (max_pos_.x() - pos.x()) * one_devide_dir;
-		double t2 = (min_pos_.x() - pos.x()) * one_devide_dir;
+		double t1 = (_max_pos.x() - pos.x()) * one_devide_dir;
+		double t2 = (_min_pos.x() - pos.x()) * one_devide_dir;
 		t_near = std::fmin(t1, t2);
 		t_far  = std::fmax(t1, t2);
 		t_max  = std::fmin(t_max, t_far);
@@ -75,8 +75,8 @@ public:
 		}
 
 		one_devide_dir = 1.0 / dir.y();
-		t1 = (max_pos_.y() - pos.y()) * one_devide_dir;
-		t2 = (min_pos_.y() - pos.y()) * one_devide_dir;
+		t1 = (_max_pos.y() - pos.y()) * one_devide_dir;
+		t2 = (_min_pos.y() - pos.y()) * one_devide_dir;
 		t_near = std::fmin(t1, t2);
 		t_far  = std::fmax(t1, t2);
 		t_max  = std::fmin(t_max, t_far);
@@ -87,8 +87,8 @@ public:
 		}
 
 		one_devide_dir = 1.0 / dir.z();
-		t1 = (max_pos_.z() - pos.z()) * one_devide_dir;
-		t2 = (min_pos_.z() - pos.z()) * one_devide_dir;
+		t1 = (_max_pos.z() - pos.z()) * one_devide_dir;
+		t2 = (_min_pos.z() - pos.z()) * one_devide_dir;
 		t_near = std::fmin(t1, t2);
 		t_far  = std::fmax(t1, t2);
 		t_max  = std::fmin(t_max, t_far);

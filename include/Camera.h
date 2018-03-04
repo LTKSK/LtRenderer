@@ -6,26 +6,26 @@ namespace LtRenderer
 
 class Camera
 {
-	Vec3  position_;
-	Vec3  x_axis_;
-	Vec3  y_axis_;
-	Vec3  z_axis_;
-	double near_clip_;
+	Vec3  _position;
+	Vec3  _x_axis;
+	Vec3  _y_axis;
+	Vec3  _z_axis;
+	double _near_clip;
 
 public:
 	Camera(Vec3 position, Vec3 direction, Vec3 up, double aspect_ratio, double near_clip)
-		:position_(position), near_clip_(near_clip)
+		:_position(position), _near_clip(near_clip)
 	{
 		//スクリーンの縦横方向の基底ベクトル
-		x_axis_    = normalize(cross(direction, up)) * aspect_ratio;
-		y_axis_    = normalize(cross(x_axis_, direction));
-		z_axis_    = direction;
+		_x_axis    = normalize(cross(direction, up)) * aspect_ratio;
+		_y_axis    = normalize(cross(_x_axis, direction));
+		_z_axis    = direction;
 	}
 
 	Ray emit(double u, double v)
 	{
-		Vec3 ray_direction = x_axis_ * u + y_axis_ * v + z_axis_;
-		Vec3 ray_position = position_ + ray_direction * near_clip_;
+		Vec3 ray_direction = _x_axis * u + _y_axis * v + _z_axis;
+		Vec3 ray_position = _position + ray_direction * _near_clip;
 		return Ray(ray_position, normalize(ray_direction));
 	}
 };
