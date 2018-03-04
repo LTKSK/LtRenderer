@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <stb/stb_image_write.h>
 #include "Random.h"
 #include "Vector.h"
 #include "Ray.h"
@@ -8,14 +9,16 @@
 #include "Intersection.h"
 #include "Camera.h"
 
+
 namespace LtRenderer{
+	static const std::string nee_mat_name = "Lambertion";
+
 	Vec3 render(const Ray& ray, Scene& scene, Random* random, const int keep_depth)
 	{
 		Vec3 attenuation = Vec3(1.0);
 		Vec3 result = Vec3(0.0);
 		Ray scatterd_ray = Ray(ray.origin(), ray.direction());
 		double russian_roulette_probability = 1.0;
-		const std::string nee_mat_name = "Lambertion";
 		int depth = 0;
 		while (true) 
 		{
@@ -78,13 +81,14 @@ int main(int argc, char** argv)
 												   LtRenderer::Vec3(0.0, 1.0, 0.0),
 												   double(width) / double(height),
 												   130.0);
-	std::vector<LtRenderer::Vec3> image;
-	image.resize(width * height);
+	std::vector<uint8_t> image;
+	image.resize(width * height * 3);
 
 	double invert_gamma = 1.0 / LtRenderer::GAMMA_VALUE;
 #pragma omp parallel for schedule(dynamic, 1) num_threads(4)
 	for (int y = 0; y < height; ++y)
-	{ 
+	{
+		std::cout << "progress..." << double(y) / double(height) << "%" << std::endl;
 		LtRenderer::Random random(y+1);
 		for (int x = 0; x < width; ++x)
 		{
@@ -96,18 +100,12 @@ int main(int argc, char** argv)
 				col += render(camera.emit(u, v), scene, &random, 5);
 			}
 			col /= double(samples);
-			col = LtRenderer::Vec3(LtRenderer::saturate(pow(col.x(), invert_gamma)), 
-								   LtRenderer::saturate(pow(col.y(), invert_gamma)), 
-								   LtRenderer::saturate(pow(col.z(), invert_gamma)));
-			
-			int pixel_id = y * width + x;
-			image[pixel_id] = LtRenderer::Vec3(int(255.99*col.x()),
-										       int(255.99*col.y()),
-										       int(255.99*col.z()));
+			int pixel_id = (y * width + x) * 3;
+			image[pixel_id + 0] = static_cast<uint8_t>(LtRenderer::saturate(pow(col.x(), invert_gamma)) * 255.0 + 0.5);
+			image[pixel_id + 1] = static_cast<uint8_t>(LtRenderer::saturate(pow(col.y(), invert_gamma)) * 255.0 + 0.5);
+			image[pixel_id + 2] = static_cast<uint8_t>(LtRenderer::saturate(pow(col.z(), invert_gamma)) * 255.0 + 0.5);
 		}
 	}
-	for (auto pixel : image)
-	{
-		std::cout << pixel.x() << " " << pixel.y() << " " << pixel.z() << " ";
-	}
+	stbi_write_bmp("render_result.bmp", width, height, 3, image.data());
+	image.clear();
 }

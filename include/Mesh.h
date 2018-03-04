@@ -85,7 +85,7 @@ public:
 			auto sqrt_det = sqrt(det);
 			auto t1 = b - sqrt_det;
 			auto t2 = b + sqrt_det;
-			//t1,t2のいずれかが、衝突時の値が判定値より大きく、なおかつ既にhitしている他のobjectより小さい場合にtrue
+			//t1,t2のいずれかが、衝突時の値が閾値より大きく、なおかつ既にhitしている他のobjectより小さい場合にtrue
 			if (t1 > D_HIT_MIN && intersection->t >= t1)
 			{
 				intersection->setNormal(normalize(ray.pointAtParameter(t1) - _position));
