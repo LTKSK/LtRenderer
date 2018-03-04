@@ -11,7 +11,7 @@ class Scene
 	std::vector<Mesh *> objects;
 	std::vector<Mesh *> light_objects_;
 	BVHTree* bvh_tree_;
-	float pdf_;
+	double pdf_;
 public:
 	Scene()
 	{
@@ -44,7 +44,7 @@ public:
 		bvh_tree_->build(objects);
 		printf("BVH Build end\n\n");
 
-		float light_area = 0.0f;
+		double light_area = 0.0;
 		for (auto obj : objects)
 		{
 			if (obj->material()->isEmissive())
@@ -53,7 +53,7 @@ public:
 				light_area += obj->surfaceArea();
 			}
 		}
-		pdf_ = 1.0f / light_area;
+		pdf_ = 1.0 / light_area;
 	}
 
 	~Scene()
@@ -133,7 +133,7 @@ public:
 			{
 				//‹——£‚Ì“ñæ‚É”½”ä—á‚·‚éŒ¸Š
 				auto G = dot0 * dot1 / light_dist2;
-				return nee_intersection.material()->emission() * (intersection->material()->albedo() / F_PI) * G * pdf_;
+				return nee_intersection.material()->emission() * (intersection->material()->albedo() / D_PI) * G * pdf_;
 			}
 		}
 		else

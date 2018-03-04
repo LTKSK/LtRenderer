@@ -18,28 +18,28 @@ public:
 	virtual inline Material* material() const = 0;
 	virtual inline AABB* boundingBox() const = 0;
 	virtual inline Vec3 randomPoint(Random* random) const = 0;
-	virtual float surfaceArea() const = 0;
+	virtual double surfaceArea() const = 0;
 };
 
 class Sphere : public Mesh
 {
 	Vec3 position_;
-	float radius_;
-	float surface_area_;
+	double radius_;
+	double surface_area_;
 	Material* material_;
 	AABB* bounding_box_;
 public:
 	Sphere() {}
-	Sphere(Vec3 center, float radius, Material* material): position_(center), radius_(radius), material_(material)
+	Sphere(Vec3 center, double radius, Material* material): position_(center), radius_(radius), material_(material)
 	{
-		float max_x = center.x() + radius;
-		float max_y = center.y() + radius;
-		float max_z = center.z() + radius;
-		float min_x = center.x() - radius;
-		float min_y = center.y() - radius;
-		float min_z = center.z() - radius;
+		double max_x = center.x() + radius;
+		double max_y = center.y() + radius;
+		double max_z = center.z() + radius;
+		double min_x = center.x() - radius;
+		double min_y = center.y() - radius;
+		double min_z = center.z() - radius;
 		bounding_box_ = new AABB(Vec3(max_x, max_y, max_z), Vec3(min_x, min_y, min_z));
-		surface_area_ =  (4.0 * F_PI * radius * radius);
+		surface_area_ =  (4.0 * D_PI * radius * radius);
 	}
 	~Sphere()
 	{
@@ -62,17 +62,17 @@ public:
 		return position_;
 	}
 
-	float surfaceArea() const
+	double surfaceArea() const
 	{
 		return surface_area_;
 	}
 
 	Vec3 randomPoint(Random* random) const
 	{
-		const auto r1 = F_PI * 2.0f * random->zeroToOneFloat();
+		const auto r1 = D_PI * 2.0 * random->zeroToOneFloat();
 		const auto r2 = random->zeroToOneFloat();
 		const auto r2s = sqrt(r2);
-		return position_ + (radius_ + F_HIT_MIN) * Vec3(sqrt(1.0 - r2 * r2) * cos(r1), sqrt(1.0 - r2 * r2) * sin(r1), r2);
+		return position_ + (radius_ + D_HIT_MIN) * Vec3(sqrt(1.0 - r2 * r2) * cos(r1), sqrt(1.0 - r2 * r2) * sin(r1), r2);
 	}
 
 	inline bool intersect(const Ray& ray, Intersection *intersection) const
@@ -86,7 +86,7 @@ public:
 			auto t1 = b - sqrt_det;
 			auto t2 = b + sqrt_det;
 			//t1,t2のいずれかが、衝突時の値が判定値より大きく、なおかつ既にhitしている他のobjectより小さい場合にtrue
-			if (t1 > F_HIT_MIN && intersection->t >= t1)
+			if (t1 > D_HIT_MIN && intersection->t >= t1)
 			{
 				intersection->setNormal(normalize(ray.pointAtParameter(t1) - position_));
 				intersection->setPosition(ray.pointAtParameter(t1));
@@ -94,7 +94,7 @@ public:
 				intersection->t = t1;
 				return true;
 			}
-			if (t2 > F_HIT_MIN && intersection->t >= t2)
+			if (t2 > D_HIT_MIN && intersection->t >= t2)
 			{
 				intersection->setNormal(normalize(ray.pointAtParameter(t2) - position_));
 				intersection->setPosition(ray.pointAtParameter(t2));
@@ -117,7 +117,7 @@ class Triangle : public Mesh
 	Vec3 edge_ab_, edge_ac_;
 	Material* material_;
 	AABB* bounding_box_;
-	float surface_area_;
+	double surface_area_;
 
 public:
 	Triangle() : Mesh() {};
@@ -149,7 +149,7 @@ public:
 
 		Vec3 cross_vec = cross(edge_ab_, edge_ac_);
 		normal_ = normalize(cross_vec);
-		surface_area_ = cross_vec.length() / 2.0f;
+		surface_area_ = cross_vec.length() / 2.0;
 	};
 	~Triangle()
 	{
@@ -172,7 +172,7 @@ public:
 		return position_;
 	}
 
-	float surfaceArea() const
+	double surfaceArea() const
 	{
 		return surface_area_;
 	}
@@ -180,7 +180,7 @@ public:
 	Vec3 randomPoint(Random* random) const
 	{
 		const auto rnd = random->zeroToOneFloat();
-		return edge_ab_ * rnd + edge_ab_ * (1.0f - rnd);
+		return edge_ab_ * rnd + edge_ab_ * (1.0 - rnd);
 	}
 
 	//行列式算出関数
@@ -195,7 +195,7 @@ public:
 	x = det(d, b, c)/det(a, b, c)で求まる。
 
 	*/
-	float det(Vec3 a, Vec3 b, Vec3 c) const
+	double det(Vec3 a, Vec3 b, Vec3 c) const
 	{
 		return (a.x()*b.y()*c.z()) + (a.y()*b.z()*c.x()) + (a.z()*b.x()*c.y()) - (a.x()*b.z()*c.y()) - (a.y()*b.x()*c.z()) - (a.z()*b.y()*c.x());
 	}
@@ -213,23 +213,23 @@ public:
 		Vec3 inv_raydir = normalize(Vec3(-ray.direction()));
 		//(a,b,c)この後の計算の共通分母になる部分.
 		//a,b,cで作られる体積で、この後出て来る体積を割って、uvtを求める
-		float denominator = det(edge_ab_, edge_ac_, inv_raydir);
+		double denominator = det(edge_ab_, edge_ac_, inv_raydir);
 		//レイが平面と並行でない場合
 		if (denominator > 0)
 		{
 			Vec3 vertex_a_pos = ray.origin() - vertex_a_;
 
 			//(d,b,c)
-			float u = det(vertex_a_pos, edge_ac_, inv_raydir) / denominator;
+			double u = det(vertex_a_pos, edge_ac_, inv_raydir) / denominator;
 			//uが範囲外だったら何もしない
 			if (0.0 <= u && u <= 1.0)
 			{
 				//(a,d,c)
-				float v = det(edge_ab_, vertex_a_pos, inv_raydir) / denominator;
+				double v = det(edge_ab_, vertex_a_pos, inv_raydir) / denominator;
 				if (0.0 <= v && u + v <= 1.0)
 				{
 					//(a,b,d)
-					float t = det(edge_ab_, edge_ac_, vertex_a_pos) / denominator;
+					double t = det(edge_ab_, edge_ac_, vertex_a_pos) / denominator;
 					if (t < 0 || t > intersection->t)
 					{
 						return false;

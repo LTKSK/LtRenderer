@@ -22,7 +22,7 @@ public:
 		return direction_;
 	}
 
-	Vec3 pointAtParameter(float t) const
+	Vec3 pointAtParameter(double t) const
 	{
 		return origin_ + direction_ * t;
 	}

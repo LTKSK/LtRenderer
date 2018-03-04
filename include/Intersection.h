@@ -14,11 +14,11 @@ class Intersection
 	Vec3 position_;
 	Material* material_;
 public:
-	float t;
+	double t;
 
 	Intersection() : normal_(Vec3()), position_(Vec3())
 	{
-		t = F_HIT_MAX;
+		t = D_HIT_MAX;
 	};
 
 	Vec3 normal() const

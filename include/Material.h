@@ -23,7 +23,7 @@ public:
 	
 	bool isEmissive()
 	{
-		return emission_.x() > 0.0f || emission_.y() > 0.0f || emission_.z() > 0.0f;
+		return emission_.x() > 0.0 || emission_.y() > 0.0 || emission_.z() > 0.0;
 	}
 
 	Vec3 albedo()
@@ -61,9 +61,9 @@ public:
 			u = normalize(cross(Vec3(1.0, 0.0, 0.0), w));
 		}
 		v = cross(w, u);
-		float r1  = F_PI * 2 * random->zeroToOneFloat();
-		float r2  = random->zeroToOneFloat();
-		float r2s = sqrt(r2);
+		double r1  = D_PI * 2 * random->zeroToOneFloat();
+		double r2  = random->zeroToOneFloat();
+		double r2s = sqrt(r2);
 
 		Vec3 diffuse_direction = normalize(u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1.0 - r2));
 
@@ -95,20 +95,20 @@ public:
 
 class Dielectric : public Material
 {
-	float ior_;
+	double ior_;
 	const std::string material_type_ = "Dierectric";
 public:
-	Dielectric(Vec3& albedo, Vec3& emission, float ior) : Material(albedo, emission), ior_(ior){}
+	Dielectric(Vec3& albedo, Vec3& emission, double ior) : Material(albedo, emission), ior_(ior){}
 	
 	Ray scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, Vec3& attenuation, Random* random) const
 	{
 		// rayが内側からオブジェクトに交差した場合にはnormalを反転させる
 		Vec3 orienting_normal = dot(normal, ray.direction()) < 0.0 ? normal : -normal;
 		bool into = dot(normal, orienting_normal) > 0.0;
-		float air_ior = 1.0;
-		float ior_ratio = into ? air_ior / ior_ : ior_ / air_ior;
-		float dot_dn = dot(ray.direction(), orienting_normal);
-		float D = 1.0 - ior_ratio * ior_ratio * (1.0 - dot_dn * dot_dn);
+		double air_ior = 1.0;
+		double ior_ratio = into ? air_ior / ior_ : ior_ / air_ior;
+		double dot_dn = dot(ray.direction(), orienting_normal);
+		double D = 1.0 - ior_ratio * ior_ratio * (1.0 - dot_dn * dot_dn);
 
 		//Dが0.0より小さい場合、屈折後のベクトルとnormalの角度が90を超えているので全反射として扱う
 		if (D < 0.0)
@@ -119,14 +119,14 @@ public:
 		}
 
 		//schlickの近似を用いて、屈折光の運ぶ光の割合を求める
-		float f0 = pow2((ior_ - air_ior) / (ior_ + air_ior));
-		float cosine = into ? -dot_dn : dot(ray.direction(), normal);
-		float re = f0 + (1 - f0) * pow5(1 - cosine);
-		float reflect_prob = 1.0 - re;
+		double f0 = pow2((ior_ - air_ior) / (ior_ + air_ior));
+		double cosine = into ? -dot_dn : dot(ray.direction(), normal);
+		double re = f0 + (1 - f0) * pow5(1 - cosine);
+		double reflect_prob = 1.0 - re;
 		//屈折時の放射輝度の変化は屈折率の比の二乗
-		float ior_ratio2 = pow2(ior_ratio);
-		float tr = reflect_prob * ior_ratio2;
-		float prob = re * 0.5 + 0.25;
+		double ior_ratio2 = pow2(ior_ratio);
+		double tr = reflect_prob * ior_ratio2;
+		double prob = re * 0.5 + 0.25;
 		//結果を乱数で分岐する
 		if (prob > random->zeroToOneFloat())
 		{

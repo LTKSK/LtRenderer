@@ -12,8 +12,8 @@ class AABB
 public:
 	AABB() 
 	{
-		max_pos_ = Vec3(-F_MAX);
-		min_pos_ = Vec3(F_MAX);
+		max_pos_ = Vec3(-D_MAX);
+		min_pos_ = Vec3(D_MAX);
 	}
 	AABB(const Vec3 &max_pos, const Vec3 &min_pos): max_pos_(max_pos), min_pos_(min_pos){}
 	~AABB() {}
@@ -46,7 +46,7 @@ public:
 		return max_pos_ - min_pos_;
 	}
 
-	float surfaceArea() const
+	double surfaceArea() const
 	{
 		Vec3 size_vec = size();
 		return (size_vec.x() * size_vec.y() + size_vec.x() * size_vec.z() + size_vec.y() * size_vec.z()) * 2.0;
@@ -58,13 +58,13 @@ public:
 		const Vec3 pos = ray.origin();
 		const Vec3 dir = ray.direction();
 
-		float t_max =  F_MAX;
-		float t_min = -F_MAX;
-		float t_near, t_far;
+		double t_max =  D_MAX;
+		double t_min = -D_MAX;
+		double t_near, t_far;
 		
-		float one_devide_dir = 1.0 / dir.x();
-		float t1 = (max_pos_.x() - pos.x()) * one_devide_dir;
-		float t2 = (min_pos_.x() - pos.x()) * one_devide_dir;
+		double one_devide_dir = 1.0 / dir.x();
+		double t1 = (max_pos_.x() - pos.x()) * one_devide_dir;
+		double t2 = (min_pos_.x() - pos.x()) * one_devide_dir;
 		t_near = std::fmin(t1, t2);
 		t_far  = std::fmax(t1, t2);
 		t_max  = std::fmin(t_max, t_far);

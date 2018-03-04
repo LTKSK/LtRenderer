@@ -14,7 +14,7 @@ namespace LtRenderer{
 		Vec3 attenuation = Vec3(1.0);
 		Vec3 result = Vec3(0.0);
 		Ray scatterd_ray = Ray(ray.origin(), ray.direction());
-		float russian_roulette_probability = 1.0f;
+		double russian_roulette_probability = 1.0;
 		const std::string nee_mat_name = "Lambertion";
 		int depth = 0;
 		while (true) 
@@ -33,7 +33,7 @@ namespace LtRenderer{
 				}
 
 				result += intersection.material()->emission() * attenuation;
-				float russian_roulette_probability = max(intersection.material()->albedo().x(),
+				double russian_roulette_probability = max(intersection.material()->albedo().x(),
 														 max(intersection.material()->albedo().y(),
 															 intersection.material()->albedo().z()));
 				// keep_depthを超えない間の再帰は保証
@@ -47,7 +47,7 @@ namespace LtRenderer{
 				}
 				else
 				{
-					russian_roulette_probability = 1.0f;
+					russian_roulette_probability = 1.0;
 				}	
 				scatterd_ray = intersection.material()->scatter(scatterd_ray,
 									            				intersection.position(),
@@ -76,13 +76,13 @@ int main(int argc, char** argv)
 	LtRenderer::Camera camera = LtRenderer::Camera(LtRenderer::Vec3(50.0, 50.0, 300),
 												   LtRenderer::normalize(LtRenderer::Vec3(0.0, 0.0, -1.0)),
 												   LtRenderer::Vec3(0.0, 1.0, 0.0),
-												   float(width) / float(height),
+												   double(width) / double(height),
 												   130.0);
 	std::vector<LtRenderer::Vec3> image;
 	image.resize(width * height);
 
-	float invert_gamma = 1.0 / LtRenderer::GAMMA_VALUE;
-#pragma omp parallel for schedule(dynamic, 1) num_threads(4)
+	double invert_gamma = 1.0 / LtRenderer::GAMMA_VALUE;
+#pragma omp parallel for schedule(dynamic, 1) num_threads(7)
 	for (int y = 0; y < height; ++y)
 	{ 
 		LtRenderer::Random random(y+1);
@@ -91,14 +91,11 @@ int main(int argc, char** argv)
 			LtRenderer::Vec3 col = LtRenderer::Vec3(0.0);
 			for (int sample = 0; sample < samples; ++sample)
 			{
-				float u = (float(x) + random.zeroToOneFloat()) / float(width) - 0.5;
-				float v = (float(y) + random.zeroToOneFloat()) / float(height) - 0.5;
-				//cameraの原点から、horizontalとverticalで定義された範囲の中へのvector
-				LtRenderer::Ray ray = camera.emit(u, v);
-	
-				col += render(ray, scene, &random, 5);
+				double u = (double(x) + random.zeroToOneFloat()) / double(width) - 0.5;
+				double v = (double(y) + random.zeroToOneFloat()) / double(height) - 0.5;
+				col += render(camera.emit(u, v), scene, &random, 5);
 			}
-			col /= float(samples);
+			col /= double(samples);
 			col = LtRenderer::Vec3(LtRenderer::saturate(pow(col.x(), invert_gamma)), 
 								   LtRenderer::saturate(pow(col.y(), invert_gamma)), 
 								   LtRenderer::saturate(pow(col.z(), invert_gamma)));

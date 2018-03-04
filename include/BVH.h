@@ -151,7 +151,7 @@ public:
 		//どの軸で分割するのが最も良いかを保存する0:x, 1:y, 2:z
 		int best_axis = -1;
 		//この値は、分割を続けるのかそれともleafとしてしまうのかの基準になる
-		float best_cost = F_HIT_MAX;
+		double best_cost = D_HIT_MAX;
 
 		double polygons_max_distance = 0.0;
 		for (int axis = 0; axis < 3; ++axis)
@@ -193,7 +193,7 @@ public:
 		bvh_node->addChild(left_bvh_node);
 		bvh_node->addChild(right_bvh_node);
 		//polygonsを分割
-		int split_index = polygons.size() / 2;
+		int split_index = int(polygons.size()) / 2;
 		std::vector<Mesh *> left_polygons(polygons.begin(), polygons.begin() + split_index);
 		std::vector<Mesh *> right_polygons(polygons.begin() + split_index, polygons.end());
 

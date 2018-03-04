@@ -7,29 +7,29 @@ namespace LtRenderer
 
 class Vec3
 {
-	float elements_[3];
+	double elements_[3];
 public:
 	Vec3()
 	{
 		elements_[0] = elements_[1] = elements_[2] = 0.0;
 	}
 
-	Vec3(const float value)
+	Vec3(const double value)
 	{
 		elements_[0] = elements_[1] = elements_[2] = value;
 	}
 
-	Vec3(float element0, float element1, float element2)
+	Vec3(double element0, double element1, double element2)
 	{
 		elements_[0] = element0;
 		elements_[1] = element1;
 		elements_[2] = element2;
 	}
 
-	inline float x() const { return elements_[0]; }
-	inline float y() const { return elements_[1]; }
-	inline float z() const { return elements_[2]; }
-	inline float operator [](int i) const
+	inline double x() const { return elements_[0]; }
+	inline double y() const { return elements_[1]; }
+	inline double z() const { return elements_[2]; }
+	inline double operator [](int i) const
 	{
 		return elements_[i];
 	}
@@ -55,11 +55,11 @@ public:
 	{
 		return Vec3(elements_[0] / value.x(), elements_[1] / value.y(), elements_[2] / value.z());
 	}
-	inline Vec3 operator * (const float value) const
+	inline Vec3 operator * (const double value) const
 	{
 		return Vec3(elements_[0] * value, elements_[1] * value, elements_[2] * value);
 	}
-	inline Vec3 operator / (const float value) const
+	inline Vec3 operator / (const double value) const
 	{
 		return Vec3(elements_[0] / value, elements_[1] / value, elements_[2] / value);
 	}
@@ -92,14 +92,14 @@ public:
 		elements_[2] /= value.z();
 		return *this;
 	}
-	inline Vec3& operator *= (const float value)
+	inline Vec3& operator *= (const double value)
 	{
 		elements_[0] *= value;
 		elements_[1] *= value;
 		elements_[2] *= value;
 		return *this;
 	}
-	inline Vec3& operator /= (const float value)
+	inline Vec3& operator /= (const double value)
 	{
 		elements_[0] /= value;
 		elements_[1] /= value;
@@ -107,13 +107,13 @@ public:
 		return *this;
 	}
 
-	inline float length() const
+	inline double length() const
 	{
 		return sqrt(elements_[0]*elements_[0] + elements_[1]*elements_[1] + elements_[2]*elements_[2]);
 	}
 };
 
-inline Vec3 operator * (const float value1, const Vec3& value2)
+inline Vec3 operator * (const double value1, const Vec3& value2)
 {
 	return Vec3(value2.x() * value1, value2.y() * value1, value2.z() * value1);
 }
@@ -122,7 +122,7 @@ inline Vec3 normalize(const Vec3& value)
 {
 	return value / value.length();
 }
-inline float dot(const Vec3 value1, const Vec3 value2)
+inline double dot(const Vec3 value1, const Vec3 value2)
 {
 	return value1.x() * value2.x() + value1.y() * value2.y() + value1.z() * value2.z();
 }
