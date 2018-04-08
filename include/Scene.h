@@ -1,7 +1,10 @@
 #pragma once
 #include <vector>
+#include <iostream>
 #include "Mesh.h"
 #include "BVH.h"
+#include "Image.h"
+#include "Object.h"
 
 namespace LtRenderer
 {
@@ -12,12 +15,13 @@ class Scene
 	std::vector<Mesh *> _light_objects;
 	BVHTree* _bvh_tree;
 	double _pdf;
+	Image* _bg_image;
 public:
 	Scene()
 	{
+		auto obj = Object();
 		//lights 
 		objects.push_back(new Sphere(Vec3(50.0, 100, 100.0), 8.5, new Lambertion(Vec3(0.0), Vec3(7.0))));
-		//objects.push_back(new Sphere(Vec3(10.0, 100, 100.0), 8.5, new Lambertion(Vec3(0.0), Vec3(12.0))));
 		//上
 		objects.push_back(new Triangle(Vec3(0, 100, -50), Vec3(100, 100, -50), Vec3(0, 100, 200), new Lambertion(Vec3(0.8, 0.3, 0.3), Vec3())));
 		objects.push_back(new Triangle(Vec3(0, 100, 200), Vec3(100, 100, -50), Vec3(100, 100, 200), new Lambertion(Vec3(0.8, 0.3, 0.3), Vec3())));
@@ -54,6 +58,7 @@ public:
 			}
 		}
 		_pdf = 1.0 / light_area;
+		_bg_image = new Image("bg.bmp");
 	}
 
 	~Scene()
@@ -61,6 +66,7 @@ public:
 		objects.clear();
 		objects.shrink_to_fit();
 		delete _bvh_tree;
+		delete _bg_image;
 	}
 
 	const auto randomLightObject(Random* random)
@@ -86,10 +92,22 @@ public:
 	{
 		return _bvh_tree->intersect(ray, intersection);
 	}
-
-	Vec3 samplingIBL()
+	Vec3 samplingIBL(const Vec3 dir)
 	{
-		return Vec3();
+		// 逆変換の式はthita = acos(z/square())
+		double thita = acos(dir.y());
+		//xz平面の角度
+		double phi = atan2(dir.z(), dir.x());
+		if (phi < 0.0)
+		{
+			phi += D_PI * 2.0;
+		}
+		//角度をpixel座標に変換する
+		
+		//radian2degree rad * 180 / D_PI;
+		//width or height / 360 1度辺りのpixel数
+		//return Vec3();
+		return _bg_image->pixelFromUV(thita / D_PI, phi / (D_PI * 2.0));
 	}
 
 	Vec3 samplingLightArea()
@@ -106,22 +124,15 @@ public:
 
 		// ライトベクトル.
 		auto light_dir = sampled_light_pos - intersection->position();
-
-		// ライトへの距離の2乗
 		auto light_dist2 = dot(light_dir, light_dir);
-
-		// 正規化.
 		light_dir = normalize(light_dir);
-
-		// ライトの法線ベクトル.
 		auto light_normal = normalize(sampled_light_pos - light->position());
 
 		auto dot0 = dot(intersection->normal(), light_dir);
 		auto dot1 = dot(light_normal, -light_dir);
 
 		//寄与が取れる場合.
-		//衝突点とlightそれぞれのdotが0以上である(裏から当たったりしていない)
-		//且つ
+		//衝突点とlightそれぞれのdotが0以上である(裏から当たったりしていない),且つ
 		//距離二乗がライトの半径の二乗より大きい
 		if (dot0 >= 0.0 && dot1 >= 0.0)
 		{
@@ -138,7 +149,7 @@ public:
 		}
 		else
 		{
-			//TODO IBL sampling
+			//TODO IBL sampling?
 		}
 		return Vec3();
 	}

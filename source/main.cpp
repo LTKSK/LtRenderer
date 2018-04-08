@@ -25,7 +25,9 @@ namespace LtRenderer{
 			Intersection intersection;
 			if (!scene.bvhIntersectScene(scatterd_ray, &intersection))
 			{
+
 				// TODO IBL sampling
+				result += attenuation * scene.samplingIBL(scatterd_ray.direction());
 				break;
 			}
 			else
@@ -71,7 +73,7 @@ int main(int argc, char** argv)
 {
 	int width   = 640;
 	int height  = 480;
-	int samples = 128;
+	int samples = 256;
 
 	std::cout << "P3\n" << width << " " << height << "\n255\n";
 
