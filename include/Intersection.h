@@ -6,50 +6,48 @@
 
 namespace LtRenderer
 {
-
-//Renderingに必要な衝突時の情報を格納するクラス
 class Intersection
 {
-	Vec3 _normal;
-	Vec3 _position;
-	Material* _material;
+    Vec3 _normal;
+    Vec3 _position;
+    Material* _material;
 public:
-	double t;
+    double t;
 
-	Intersection() : _normal(Vec3()), _position(Vec3())
-	{
-		t = D_HIT_MAX;
-	};
+    Intersection() : _normal(Vec3()), _position(Vec3())
+    {
+        t = D_HIT_MAX;
+    };
 
-	Vec3 normal() const
-	{
-		return _normal;
-	}
+    Vec3 normal() const
+    {
+        return _normal;
+    }
 
-	void setNormal(Vec3 normal)
-	{
-		_normal = normal;
-	}
+    void setNormal(Vec3 normal)
+    {
+        _normal = normal;
+    }
 
-	Vec3 position() const
-	{
-		return _position;
-	}
+    Vec3 position() const
+    {
+        return _position;
+    }
 
-	void setPosition(Vec3 position)
-	{
-		_position = position;
-	}
+    void setPosition(Vec3 position)
+    {
+        _position = position;
+    }
 
-	Material* material() const
-	{
-		return _material;
-	}
+    Material* material() const
+    {
+        return _material;
+    }
 
-	void setMaterial(Material* material)
-	{
-		_material = material;
-	}
+    void setMaterial(Material* material)
+    {
+        _material = material;
+    }
 };
 
 }//namespace LtRenderer
