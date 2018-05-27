@@ -10,20 +10,20 @@
 namespace LtRenderer
 {
 
-class BVH
+class BVHNode
 {
-    //BVHの当たり判定
+    //BVHNodeの当たり判定
     AABB* bounding_box;
     //二分木でchildを保持する
     std::vector<Mesh *> leaf_polygons;
-    std::vector<BVH *> children;
+    std::vector<BVHNode *> children;
 
 public:
-    BVH()
+    BVHNode()
     {
         bounding_box = new AABB();
     }
-    ~BVH()
+    ~BVHNode()
     {
         delete bounding_box;
         leaf_polygons.clear();
@@ -32,7 +32,7 @@ public:
         children.shrink_to_fit();
     }
 
-    void addChild(BVH* child)
+    void addChild(BVHNode* child)
     {
         if (children.size() == 2)
         {
@@ -41,12 +41,12 @@ public:
         children.push_back(child);
     }
 
-    BVH* leftChild()
+    BVHNode* leftChild()
     {
         return children[0];
     }
 
-    BVH* rightChild()
+    BVHNode* rightChild()
     {
         return children[1];
     }
@@ -77,16 +77,16 @@ public:
     }
 };
 
-class BVHTree
+class BVH
 {
     std::vector<Mesh *> polygons;
-    BVH* root_bvh;
+    BVHNode* root_bvh;
 public:
-    BVHTree()
+    BVH()
     {
-        root_bvh = new BVH();
+        root_bvh = new BVHNode();
     }
-    ~BVHTree()
+    ~BVH()
     {
         polygons.clear();
         polygons.shrink_to_fit();
@@ -101,13 +101,13 @@ public:
         return;
     }
 
-    void makeLeaf(BVH* bvh, std::vector<Mesh *> leaf_polygons)
+    void makeLeaf(BVHNode* bvh, std::vector<Mesh *> leaf_polygons)
     {
         createAABBfromPolygons(bvh->boundingBox(), leaf_polygons);
         bvh->setLeafPolygons(leaf_polygons);
     }
 
-    inline bool intersect(const Ray& ray, Intersection* intersection, BVH* bvh_node=nullptr)
+    inline bool intersect(const Ray& ray, Intersection* intersection, BVHNode* bvh_node=nullptr)
     {
         //初回ループ用の分岐
         if (bvh_node == nullptr)
@@ -138,9 +138,9 @@ public:
         return is_hit;
     }
 
-    void build(std::vector<Mesh *> polygons, BVH* bvh=nullptr)
+    void build(std::vector<Mesh *> polygons, BVHNode* bvh=nullptr)
     {
-        BVH* bvh_node = bvh;
+        BVHNode* bvh_node = bvh;
         if (bvh_node == nullptr)
         {
             bvh_node = root_bvh;
@@ -188,8 +188,8 @@ public:
             }
         });
 
-        BVH* left_bvh_node = new BVH();
-        BVH* right_bvh_node = new BVH();
+        BVHNode* left_bvh_node = new BVHNode();
+        BVHNode* right_bvh_node = new BVHNode();
         bvh_node->addChild(left_bvh_node);
         bvh_node->addChild(right_bvh_node);
         //polygonsを分割

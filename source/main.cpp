@@ -72,18 +72,17 @@ int main(int argc, char** argv)
     int samples = 256;
 
     std::cout << "P3\n" << width << " " << height << "\n255\n";
-
     LtRenderer::Scene scene;
-    LtRenderer::Camera camera = LtRenderer::Camera(LtRenderer::Vec3(50.0, 50.0, 300),
+    LtRenderer::Camera camera = LtRenderer::Camera(LtRenderer::Vec3(0.0, 54.0, 185.0),
                                                    LtRenderer::normalize(LtRenderer::Vec3(0.0, 0.0, -1.0)),
                                                    LtRenderer::Vec3(0.0, 1.0, 0.0),
                                                    double(width) / double(height),
-                                                   130.0);
+                                                   10.0);
     std::vector<uint8_t> image;
     image.resize(width * height * 3);
 
     double invert_gamma = 1.0 / LtRenderer::GAMMA_VALUE;
-#pragma omp parallel for schedule(dynamic, 1) num_threads(4)
+#pragma omp parallel for schedule(dynamic, 1) num_threads(7)
     for (int y = 0; y < height; ++y)
     {
         std::cout << "progress..." << double(y) / double(height) * 100.0 << "%" << std::endl;

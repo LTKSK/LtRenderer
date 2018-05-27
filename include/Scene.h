@@ -11,18 +11,18 @@ namespace LtRenderer
 
 class Scene
 {
-    std::vector<Mesh *> objects;
+    std::vector<Mesh *> _objects;
     std::vector<Mesh *> _light_objects;
-    BVHTree* _bvh_tree;
+    BVH* _bvh;
     double _pdf;
     Image* _bg_image;
 public:
     Scene()
     {
-        auto obj = Object();
+        auto loader = ObjectLoader();
+		_objects = loader.load();
         //lights
-		objects = obj.objects();
-        objects.push_back(new Sphere(Vec3(50.0, 100, 100.0), 8.5, new Lambertion(Vec3(0.0), Vec3(7.0))));
+        _objects.push_back(new Sphere(Vec3(0, 75.0, 0.0), 2.5, new Lambertion(Vec3(0.0), Vec3(7.0))));
         // //ã
         // objects.push_back(new Triangle(Vec3(0, 100, -50), Vec3(100, 100, -50), Vec3(0, 100, 200), new Lambertion(Vec3(0.8, 0.3, 0.3), Vec3())));
         // objects.push_back(new Triangle(Vec3(0, 100, 200), Vec3(100, 100, -50), Vec3(100, 100, 200), new Lambertion(Vec3(0.8, 0.3, 0.3), Vec3())));
@@ -40,16 +40,12 @@ public:
         // objects.push_back(new Triangle(Vec3(0, 0, -50), Vec3(100, 0, -50), Vec3(0, 100, -50), new Lambertion(Vec3(0.8, 0.8, 0.8), Vec3())));
 
         // //spheres
-        // objects.push_back(new Sphere(Vec3(27.0, 60.5, 78.0), 16.5, new Metal(Vec3(0.0, 0.99, 0.0), Vec3())));
-        // objects.push_back(new Sphere(Vec3(40.0, 16.5, 147.0), 16.5, new Lambertion(Vec3(0.8, 0.8, 0.8), Vec3())));
-        // objects.push_back(new Sphere(Vec3(73.0, 40.5, 100.0), 16.5, new Dielectric(Vec3(1.0), Vec3(), 1.5)));
-        _bvh_tree = new BVHTree();
+        _bvh = new BVH();
         printf("BVH Build start\n");
-        _bvh_tree->build(objects);
+        _bvh->build(_objects);
         printf("BVH Build end\n\n");
-
         double light_area = 0.0;
-        for (auto obj : objects)
+        for (auto obj : _objects)
         {
             if (obj->material()->isEmissive())
             {
@@ -63,9 +59,9 @@ public:
 
     ~Scene()
     {
-        objects.clear();
-        objects.shrink_to_fit();
-        delete _bvh_tree;
+        _objects.clear();
+        _objects.shrink_to_fit();
+        delete _bvh;
         delete _bg_image;
     }
 
@@ -75,22 +71,9 @@ public:
         return _light_objects[random_index];
     }
 
-    /*inline bool intersectScene(const Ray& ray, Intersection* intersection)
-    {
-        bool is_hit = false;
-        for (auto count = 0; count < objects.size(); ++count)
-        {
-            if (objects[count]->intersect(ray, intersection))
-            {
-                is_hit = true;
-            }
-        }
-        return is_hit;
-    }*/
-
     inline bool bvhIntersectScene(const Ray& ray, Intersection* intersection)
     {
-        return _bvh_tree->intersect(ray, intersection);
+        return _bvh->intersect(ray, intersection);
     }
 
     Vec3 samplingIBL(const Vec3 dir)
