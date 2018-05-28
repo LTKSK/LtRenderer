@@ -4,7 +4,7 @@
 #include "Mesh.h"
 #include "BVH.h"
 #include "Image.h"
-#include "Object.h"
+#include "ObjectLoader.h"
 
 namespace LtRenderer
 {
