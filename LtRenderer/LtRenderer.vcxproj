@@ -31,7 +31,7 @@
     <ClInclude Include="..\include\Material.h" />
     <ClInclude Include="..\include\MathLib.h" />
     <ClInclude Include="..\include\Mesh.h" />
-    <ClInclude Include="..\include\Object.h" />
+    <ClInclude Include="..\include\ObjectLoader.h" />
     <ClInclude Include="..\include\Random.h" />
     <ClInclude Include="..\include\Ray.h" />
     <ClInclude Include="..\include\Scene.h" />

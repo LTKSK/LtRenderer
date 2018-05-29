@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -24,16 +25,65 @@ class ObjectLoader {
 public:
     ObjectLoader() {}
     ~ObjectLoader() {};
+
+	std::map<std::string, Material *> _load_materials(std::string material_name)
+	{
+		std::ifstream ifs(material_name);
+		std::string str;
+		if (ifs.fail())
+		{
+			std::cerr << "material load failed!" << std::endl;
+		}
+		std::map<std::string, Material *> name_material_map;
+
+		std::string name;
+		Vec3 diffuse;
+		Vec3 emission;
+		while (std::getline(ifs, str))
+		{
+			std::vector<std::string> splitted_str = split(&str, ' ');
+			if (splitted_str.empty())
+			{
+				continue;
+			}
+			//name
+			if (splitted_str[0] == "newmtl")
+			{
+				name = splitted_str[1];
+			}
+			//diffuse
+			if (splitted_str[0] == "Kd")
+			{
+				diffuse = Vec3(atof(splitted_str[1].c_str()),
+							   atof(splitted_str[2].c_str()),
+							   atof(splitted_str[3].c_str()));
+			}
+			//ambientは使わないのでemissionとしてmap
+			if (splitted_str[0] == "Ka")
+			{
+				emission = Vec3(atof(splitted_str[1].c_str()),
+								atof(splitted_str[2].c_str()),
+								atof(splitted_str[3].c_str()));
+			}
+			//とりあえずDiffuseだけ。読めるところまで実装できたら、shading_group名で分岐しようと思う
+			name_material_map[name] = new Lambertion(diffuse, emission);
+		}
+		return name_material_map;
+	}
+
     std::vector<Mesh *> load()
     {
 		std::vector<Mesh *> triangles;
-		std::ifstream ifs("cornell_box2.obj");
+		//std::ifstream ifs("cornell_box2.obj");
+		std::ifstream ifs("planes.obj");
 		std::string str;
 		if (ifs.fail())
 		{
 			std::cerr << "obj load failed!" << std::endl;
 		}
 
+		std::map<std::string, Material *> name_material_map;
+		std::string use_material_name;
 		std::vector<Vec3> vertices;
 		while (std::getline(ifs, str))
 		{
@@ -41,6 +91,14 @@ public:
 			if (splitted_str.empty())
 			{
 				continue;
+			}
+			if (splitted_str[0] == "mtllib")
+			{
+				name_material_map = _load_materials(splitted_str[1]);
+			}
+			if (splitted_str[0] == "usemtl")
+			{
+				use_material_name = splitted_str[1];
 			}
 			if (splitted_str[0] == "v")
 			{
@@ -67,9 +125,10 @@ public:
 				int face_vertex_index_2 = std::atoi(split(&splitted_str[2], '/')[0].c_str()) - 1;
 				int face_vertex_index_3 = std::atoi(split(&splitted_str[3], '/')[0].c_str()) - 1;
 				triangles.push_back(new Triangle(vertices[face_vertex_index_1],
-												 vertices[face_vertex_index_2],
-												 vertices[face_vertex_index_3],
-												 new Lambertion(Vec3(8.0, 1.0, 1.0), Vec3())));
+										         vertices[face_vertex_index_2],
+										         vertices[face_vertex_index_3],
+										         name_material_map[use_material_name]));
+					//new Lambertion(Vec3(8.0, 1.0, 1.0), Vec3())));
 			}
 		}
         return triangles;
