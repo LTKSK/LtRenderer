@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <regex>
 #include <string>
 #include <fstream>
 #include <sstream>
