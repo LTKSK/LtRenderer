@@ -7,7 +7,6 @@ namespace LtRenderer
 
 class Vec3
 {
-    double _elements[3];
 public:
     Vec3()
     {
@@ -111,6 +110,8 @@ public:
     {
         return sqrt(_elements[0]*_elements[0] + _elements[1]*_elements[1] + _elements[2]*_elements[2]);
     }
+private:
+	double _elements[3];
 };
 
 inline Vec3 operator * (const double value1, const Vec3& value2)

@@ -4,7 +4,6 @@
 #include "Random.h"
 #include "Vector.h"
 #include "Ray.h"
-#include "Intersection.h"
 #include "Scene.h"
 #include "Intersection.h"
 #include "Camera.h"
@@ -23,7 +22,7 @@ namespace LtRenderer{
         while (true)
         {
             Intersection intersection;
-            if (!scene.bvhIntersectScene(scatterd_ray, &intersection))
+            if (!scene.intersectScene(scatterd_ray, &intersection))
             {
                 //result += attenuation * scene.samplingIBL(scatterd_ray.direction());
                 break;
@@ -73,7 +72,8 @@ int main(int argc, char** argv)
 
     std::cout << "P3\n" << width << " " << height << "\n255\n";
     LtRenderer::Scene scene;
-    LtRenderer::Camera camera = LtRenderer::Camera(LtRenderer::Vec3(0.0, 54.0, 185.0),
+    LtRenderer::Camera camera = LtRenderer::Camera(//LtRenderer::Vec3(0.0, 54.0, 185.0),
+												   LtRenderer::Vec3(0.0, 13, 50),
                                                    LtRenderer::normalize(LtRenderer::Vec3(0.0, 0.0, -1.0)),
                                                    LtRenderer::Vec3(0.0, 1.0, 0.0),
                                                    double(width) / double(height),

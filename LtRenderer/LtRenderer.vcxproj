@@ -27,6 +27,8 @@
     <ClCompile Include="..\source\main.cpp" />
     <ClCompile Include="..\source\Material.cpp" />
     <ClCompile Include="..\source\Mesh.cpp" />
+    <ClCompile Include="..\source\ObjectLoadercpp.cpp" />
+    <ClCompile Include="..\source\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\BVH.h" />
