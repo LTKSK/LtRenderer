@@ -52,18 +52,29 @@ std::map<std::string, Material *> ObjectLoader::_load_materials(std::string mate
 		if (splitted_str[0] == "Kd")
 		{
 			diffuse = Vec3(atof(splitted_str[1].c_str()),
-				atof(splitted_str[2].c_str()),
-				atof(splitted_str[3].c_str()));
+						   atof(splitted_str[2].c_str()),
+						   atof(splitted_str[3].c_str()));
 		}
 		//ambientは使わないのでemissionとしてmap
 		if (splitted_str[0] == "Ka")
 		{
 			emission = Vec3(atof(splitted_str[1].c_str()),
-				atof(splitted_str[2].c_str()),
-				atof(splitted_str[3].c_str()));
+							atof(splitted_str[2].c_str()),
+							atof(splitted_str[3].c_str()));
 		}
-		//とりあえずDiffuseだけ。読めるところまで実装できたら、shading_group名で分岐しようと思う
 		name_material_map[name] = new Lambertion(diffuse, emission);
+		if (std::regex_search(name, std::regex("dielectric")))
+		{
+			name_material_map[name] = new Dielectric(diffuse, emission, 1.5);
+			continue;
+		}
+		if (std::regex_search(name, std::regex("metal")))
+		{
+			name_material_map[name] = new Metal(diffuse, emission);
+			continue;
+		}
+		name_material_map[name] = new Lambertion(diffuse, emission);
+
 	}
 	return name_material_map;
 }
@@ -122,10 +133,9 @@ std::vector<Mesh *> ObjectLoader::load()
 			int face_vertex_index_2 = std::atoi(split(&splitted_str[2], '/')[0].c_str()) - 1;
 			int face_vertex_index_3 = std::atoi(split(&splitted_str[3], '/')[0].c_str()) - 1;
 			triangles.push_back(new Triangle(vertices[face_vertex_index_1],
-				vertices[face_vertex_index_2],
-				vertices[face_vertex_index_3],
-				name_material_map[use_material_name]));
-			//new Lambertion(Vec3(8.0, 1.0, 1.0), Vec3())));
+											 vertices[face_vertex_index_2],
+											 vertices[face_vertex_index_3],
+											 name_material_map[use_material_name]));
 		}
 	}
 	return triangles;
