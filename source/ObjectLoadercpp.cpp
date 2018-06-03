@@ -62,7 +62,7 @@ std::map<std::string, Material *> ObjectLoader::_load_materials(std::string mate
 							atof(splitted_str[2].c_str()),
 							atof(splitted_str[3].c_str()));
 		}
-		name_material_map[name] = new Lambertion(diffuse, emission);
+
 		if (std::regex_search(name, std::regex("dielectric")))
 		{
 			name_material_map[name] = new Dielectric(diffuse, emission, 1.5);
@@ -73,6 +73,7 @@ std::map<std::string, Material *> ObjectLoader::_load_materials(std::string mate
 			name_material_map[name] = new Metal(diffuse, emission);
 			continue;
 		}
+		//default‚Ílambert‚ğg‚¤‚æ‚¤‚É
 		name_material_map[name] = new Lambertion(diffuse, emission);
 
 	}
@@ -81,9 +82,9 @@ std::map<std::string, Material *> ObjectLoader::_load_materials(std::string mate
 
 std::vector<Mesh *> ObjectLoader::load()
 {
+	//Œ»ó‚Ítriangle‚Ì‚İ‘Î‰
 	std::vector<Mesh *> triangles;
-	std::ifstream ifs("cornell_box.obj");
-	//std::ifstream ifs("planes.obj");
+	std::ifstream ifs("assets/cornell_box.obj");
 	std::string str;
 	if (ifs.fail())
 	{
@@ -102,7 +103,7 @@ std::vector<Mesh *> ObjectLoader::load()
 		}
 		if (splitted_str[0] == "mtllib")
 		{
-			name_material_map = _load_materials(splitted_str[1]);
+			name_material_map = _load_materials("assets/"+splitted_str[1]);
 		}
 		if (splitted_str[0] == "usemtl")
 		{
@@ -112,8 +113,8 @@ std::vector<Mesh *> ObjectLoader::load()
 		{
 			//vertices
 			vertices.push_back(Vec3(std::stod(splitted_str[1]),
-				std::stod(splitted_str[2]),
-				std::stod(splitted_str[3])));
+									std::stod(splitted_str[2]),
+									std::stod(splitted_str[3])));
 
 		}
 		if (splitted_str[0] == "vt")

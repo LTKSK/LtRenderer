@@ -72,8 +72,7 @@ int main(int argc, char** argv)
 
     std::cout << "P3\n" << width << " " << height << "\n255\n";
     LtRenderer::Scene scene;
-    LtRenderer::Camera camera = LtRenderer::Camera(//LtRenderer::Vec3(0.0, 54.0, 185.0),
-												   LtRenderer::Vec3(0.0, 13, 50),
+    LtRenderer::Camera camera = LtRenderer::Camera(LtRenderer::Vec3(0.0, 13, 50),
                                                    LtRenderer::normalize(LtRenderer::Vec3(0.0, 0.0, -1.0)),
                                                    LtRenderer::Vec3(0.0, 1.0, 0.0),
                                                    double(width) / double(height),

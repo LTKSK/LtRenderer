@@ -24,7 +24,7 @@ Scene::Scene()
 		}
 	}
 	_pdf = 1.0 / light_area;
-	_bg_image = new Image("bg.bmp");
+	_bg_image = new Image("assets/bg.bmp");
 }
 
 Scene::~Scene()
