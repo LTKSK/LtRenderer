@@ -4,14 +4,6 @@
 
 namespace LtRenderer
 {
-class ImageLoader
-{
-public:
-	ImageLoader();
-	~ImageLoader();
-	Image* load(std::string path);
-};
-
 
 class Image
 {
@@ -24,6 +16,14 @@ private:
 	int _width;
 	int _height;
 	std::vector<Vec3> _pixels;
+};
+
+class ImageLoader
+{
+public:
+	ImageLoader();
+	~ImageLoader();
+	Image* load(std::string path);
 };
 
 }//namespace LtRenderer

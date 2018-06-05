@@ -189,7 +189,6 @@ inline bool Triangle::intersect(const Ray& ray, Intersection *intersection) cons
 	if (denominator > 0)
 	{
 		Vec3 vertex_a_pos = ray.origin() - _vertex_a;
-
 		//(d,b,c)
 		double u = det(vertex_a_pos, _edge_ac, inv_raydir) / denominator;
 		//u‚ª”ÍˆÍŠO‚¾‚Á‚½‚ç‰½‚à‚µ‚È‚¢

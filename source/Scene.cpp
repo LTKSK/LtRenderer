@@ -8,10 +8,9 @@ Scene::Scene()
 {
 	auto loader = ObjectLoader();
 	_objects = loader.load();
-	//lights
 	_objects.push_back(new Sphere(Vec3(0, 20.0, 0.0), 2.5, new Lambertion(Vec3(0.0), Vec3(7.0))));
-	_bvh = new BVH();
 	printf("BVH Build start\n");
+	_bvh = new BVH();
 	_bvh->build(_objects);
 	printf("BVH Build end\n\n");
 	double light_area = 0.0;
@@ -24,7 +23,7 @@ Scene::Scene()
 		}
 	}
 	_pdf = 1.0 / light_area;
-	_bg_image = new Image("assets/bg.bmp");
+	_bg_image = ImageLoader().load("assets/bg.bmp");
 }
 
 Scene::~Scene()

@@ -76,7 +76,7 @@ int main(int argc, char** argv)
                                                    LtRenderer::normalize(LtRenderer::Vec3(0.0, 0.0, -1.0)),
                                                    LtRenderer::Vec3(0.0, 1.0, 0.0),
                                                    double(width) / double(height),
-                                                   10.0);
+                                                   1.0);
     std::vector<uint8_t> image;
     image.resize(width * height * 3);
 

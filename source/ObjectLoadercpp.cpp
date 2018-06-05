@@ -85,7 +85,6 @@ std::vector<Mesh *> ObjectLoader::load()
 	//Œ»ó‚Ítriangle‚Ì‚İ‘Î‰
 	std::vector<Mesh *> triangles;
 	std::ifstream ifs("assets/cornell_box.obj");
-	std::string str;
 	if (ifs.fail())
 	{
 		std::cerr << "obj load failed!" << std::endl;
@@ -94,6 +93,7 @@ std::vector<Mesh *> ObjectLoader::load()
 	std::map<std::string, Material *> name_material_map;
 	std::string use_material_name;
 	std::vector<Vec3> vertices;
+	std::string str;
 	while (std::getline(ifs, str))
 	{
 		std::vector<std::string> splitted_str = split(&str, ' ');
