@@ -87,7 +87,10 @@ std::string Metal::materialType() const
 Metal
 */
 
-Dielectric::Dielectric(Vec3& albedo, Vec3& emission, double ior) : Material(albedo, emission) {}
+Dielectric::Dielectric(Vec3& albedo, Vec3& emission, double ior) : Material(albedo, emission) 
+{
+	_ior = ior;
+}
 
 Dielectric::~Dielectric() {}
 

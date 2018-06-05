@@ -24,7 +24,7 @@ namespace LtRenderer{
             Intersection intersection;
             if (!scene.intersectScene(scatterd_ray, &intersection))
             {
-                //result += attenuation * scene.samplingIBL(scatterd_ray.direction());
+                result += attenuation * scene.samplingIBL(scatterd_ray.direction());
                 break;
             }
             else
