@@ -156,6 +156,7 @@ Vec3 Triangle::randomPoint(Random* random) const
 
 //行列式算出関数
 //クラメルの公式で、三角形上の交差位置を求める際に使用する
+//参考: https://shikousakugo.wordpress.com/2012/06/27/ray-intersection-2/
 /*
 具体的な公式は
 x + y + z = 9

@@ -84,8 +84,7 @@ std::vector<Mesh *> ObjectLoader::load()
 {
 	//Œ»ó‚Ítriangle‚Ì‚İ‘Î‰
 	std::vector<Mesh *> triangles;
-	//std::ifstream ifs("assets/cornell_box.obj");
-	std::ifstream ifs("assets/dielectric.obj");
+	std::ifstream ifs("assets/cornell_box.obj");
 	if (ifs.fail())
 	{
 		std::cerr << "obj load failed!" << std::endl;

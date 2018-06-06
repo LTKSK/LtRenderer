@@ -1,24 +1,24 @@
 newmtl cornell_box_initialShadingGroup
 illum 4
-Kd 0.50 0.50 0.50
+Kd 0.04 0.52 0.04
 Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
-newmtl initialShadingGroup
+newmtl cornell_box_initialShadingGroup2
 illum 4
-Kd 0.50 0.50 0.50
+Kd 0.00 0.00 0.00
 Ka 11.00 11.00 11.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+newmtl dielectricSG
+illum 4
+Kd 1.00 1.00 1.00
+Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
 newmtl lambert2SG
 illum 4
 Kd 0.82 0.82 0.82
-Ka 0.00 0.00 0.00
-Tf 1.00 1.00 1.00
-Ni 1.00
-newmtl metal3SG
-illum 4
-Kd 0.00 1.00 0.24
 Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
@@ -34,7 +34,7 @@ Kd 0.00 0.20 1.00
 Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
-newmtl dielectricSG
+newmtl metal3SG
 illum 4
 Kd 1.00 1.00 1.00
 Ka 0.00 0.00 0.00
