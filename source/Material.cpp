@@ -55,7 +55,7 @@ Ray Lambertion::scatter(const Ray& ray, const Vec3& hit_position, const Vec3& no
 	Vec3 diffuse_direction = normalize(u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1.0 - r2));
 
 	attenuation *= _albedo;
-	return Ray(hit_position + diffuse_direction*0.01f, diffuse_direction);
+	return Ray(hit_position + diffuse_direction * 0.01, diffuse_direction);
 }
 
 std::string Lambertion::materialType() const
@@ -75,7 +75,7 @@ Ray Metal::scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal,
 {
 	Vec3 reflect_direction = normalize(reflect(ray.direction(), normal));
 	attenuation *= _albedo;
-	return Ray(hit_position + reflect_direction * 0.01f, reflect_direction);
+	return Ray(hit_position + reflect_direction * 0.01, reflect_direction);
 }
 
 std::string Metal::materialType() const
@@ -84,7 +84,7 @@ std::string Metal::materialType() const
 }
 
 /*
-Metal
+Dielectric
 */
 
 Dielectric::Dielectric(Vec3& albedo, Vec3& emission, double ior) : Material(albedo, emission) , _ior(ior) {}
@@ -106,7 +106,7 @@ Ray Dielectric::scatter(const Ray& ray, const Vec3& hit_position, const Vec3& no
 	{
 		attenuation *= _albedo;
 		Vec3 reflect_direction = normalize(reflect(ray.direction(), orienting_normal));
-		return Ray(hit_position + reflect_direction * 0.01f, reflect_direction);
+		return Ray(hit_position + reflect_direction * 0.01, reflect_direction);
 	}
 
 	//schlick‚Ì‹ß—‚ğ—p‚¢‚ÄA‹üÜŒõ‚Ì‰^‚ÔŒõ‚ÌŠ„‡‚ğ‹‚ß‚é
