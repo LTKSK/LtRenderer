@@ -10,6 +10,7 @@
 
 
 namespace LtRenderer{
+
     static const std::string nee_mat_name = "Lambertion";
 
     Vec3 render(const Ray& ray, Scene& scene, Random* random, const int keep_depth)
