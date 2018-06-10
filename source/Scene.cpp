@@ -42,7 +42,13 @@ const auto Scene::randomLightObject(Random* random)
 
 bool Scene::intersectScene(const Ray& ray, Intersection* intersection)
 {
-	return _bvh->intersect(ray, intersection);
+	bool is_hit = false;
+	for (auto obj : _objects)
+	{
+		is_hit |= obj->intersect(ray, intersection);
+	}
+	return is_hit;
+	//return _bvh->intersect(ray, intersection);
 }
 
 Vec3 Scene::samplingIBL(const Vec3 dir)
@@ -59,7 +65,6 @@ Vec3 Scene::samplingIBL(const Vec3 dir)
 
 	//radian2degree rad * 180 / D_PI;
 	//width or height / 360 1“x•Ó‚è‚Ìpixel”
-	//return Vec3();
 	return _bg_image->pixelFromUV(thita / D_PI, phi / (D_PI * 2.0));
 }
 
