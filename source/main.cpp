@@ -28,36 +28,34 @@ namespace LtRenderer{
                 //result += attenuation * scene.samplingIBL(scatterd_ray.direction());
                 break;
             }
+            
+            if (intersection.material()->materialType() == nee_mat_name)
+            {
+                result += attenuation * scene.nextEventEstimation(&intersection, random);
+            }
+
+            result += intersection.material()->emission() * attenuation;
+            double russian_roulette_probability = max(intersection.material()->albedo().x(),
+                                                        max(intersection.material()->albedo().y(),
+                                                            intersection.material()->albedo().z()));
+            if (depth > keep_depth)
+            {
+                if (random->zeroToOneFloat() >= russian_roulette_probability)
+                {
+                    break;
+                }
+            }
             else
             {
-                if (intersection.material()->materialType() == nee_mat_name)
-                {
-                    result += attenuation * scene.nextEventEstimation(&intersection, random);
-                }
-
-                result += intersection.material()->emission() * attenuation;
-                double russian_roulette_probability = max(intersection.material()->albedo().x(),
-                                                         max(intersection.material()->albedo().y(),
-                                                             intersection.material()->albedo().z()));
-                if (depth > keep_depth)
-                {
-                    if (random->zeroToOneFloat() >= russian_roulette_probability)
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    russian_roulette_probability = 1.0;
-                }
-                scatterd_ray = intersection.material()->scatter(scatterd_ray,
-                                                                intersection.position(),
-                                                                intersection.normal(),
-                                                                attenuation,
-                                                                random);
-                attenuation /= russian_roulette_probability;
-                ++depth;
+                russian_roulette_probability = 1.0;
             }
+            scatterd_ray = intersection.material()->scatter(scatterd_ray,
+                                                            intersection.position(),
+                                                            intersection.normal(),
+                                                            attenuation,
+                                                            random);
+            attenuation /= russian_roulette_probability;
+            ++depth;
         }
         return result;
     }
