@@ -104,8 +104,8 @@ Triangle::Triangle(const Vec3& vertex_a,
 	_edge_ac = _vertex_c - _vertex_a;
 
 	_position = Vec3((_vertex_a.x() + _vertex_b.x() + _vertex_c.x()) / 3,
-		(_vertex_a.y() + _vertex_b.y() + _vertex_c.y()) / 3,
-		(_vertex_a.z() + _vertex_b.z() + _vertex_c.z()) / 3);
+					 (_vertex_a.y() + _vertex_b.y() + _vertex_c.y()) / 3,
+					 (_vertex_a.z() + _vertex_b.z() + _vertex_c.z()) / 3);
 
 	//三角形を構成する3頂点の各軸の最大最小からAABBを構築する
 	double max_x = std::fmax(_vertex_a.x(), std::fmax(_vertex_b.x(), _vertex_c.x()));
@@ -115,11 +115,11 @@ Triangle::Triangle(const Vec3& vertex_a,
 	double min_y = std::fmin(_vertex_a.y(), std::fmin(_vertex_b.y(), _vertex_c.y()));
 	double min_z = std::fmin(_vertex_a.z(), std::fmin(_vertex_b.z(), _vertex_c.z()));
 	_bounding_box = new AABB(Vec3(max_x, max_y, max_z),
-		Vec3(min_x, min_y, min_z));
+							 Vec3(min_x, min_y, min_z));
 
 	Vec3 cross_vec = cross(_edge_ab, _edge_ac);
-	_normal = normalize(cross_vec);
 	_surface_area = cross_vec.length() / 2.0;
+	_normal = normalize(cross_vec);
 }
 
 Triangle::~Triangle()
@@ -183,6 +183,7 @@ inline bool Triangle::intersect(const Ray& ray, Intersection *intersection) cons
 {
 	//公式の関係で、rayは逆向き
 	Vec3 inv_raydir = normalize(Vec3(-ray.direction()));
+	
 	//(a,b,c)この後の計算の共通分母になる部分.
 	//a,b,cで作られる体積で、この後出て来る体積を割って、uvtを求める
 	double denominator = det(_edge_ab, _edge_ac, inv_raydir);
@@ -201,7 +202,7 @@ inline bool Triangle::intersect(const Ray& ray, Intersection *intersection) cons
 			{
 				//(a,b,d)
 				double t = det(_edge_ab, _edge_ac, vertex_a_pos) / denominator;
-				if (t < 0 || t > intersection->t)
+				if (t < 0.0 || t > intersection->t)
 				{
 					return false;
 				}
