@@ -22,6 +22,12 @@ namespace LtRenderer{
         int depth = 0;
         while (true)
         {
+			// attenuation‚ÌŠe—v‘f‚ª0.0‚Ì‚Æ‚«A‚»‚êˆÈã‚Ìloop‚ÍŠñ—^‚ªæ‚ê‚È‚¢‚½‚ßbreak‚·‚é
+			if (attenuation.x() <= 0.0 && attenuation.y() <= 0.0 && attenuation.z() <= 0.0)
+			{
+				break;
+			}
+
             Intersection intersection;
             if (!scene.intersectScene(scatterd_ray, &intersection))
             {
@@ -31,7 +37,7 @@ namespace LtRenderer{
             
             if (intersection.material()->materialType() == nee_mat_name)
             {
-                result += attenuation * scene.nextEventEstimation(&intersection, random);
+                //result += attenuation * scene.nextEventEstimation(&intersection, random);
             }
 
             result += intersection.material()->emission() * attenuation;
