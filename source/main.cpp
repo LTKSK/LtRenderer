@@ -37,7 +37,7 @@ namespace LtRenderer{
             
             if (intersection.material()->materialType() == nee_mat_name)
             {
-                //result += attenuation * scene.nextEventEstimation(&intersection, random);
+                result += attenuation * scene.nextEventEstimation(&intersection, random);
             }
 
             result += intersection.material()->emission() * attenuation;

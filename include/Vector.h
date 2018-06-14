@@ -123,14 +123,16 @@ inline Vec3 normalize(const Vec3& value)
 {
     return value / value.length();
 }
+
 inline double dot(const Vec3 value1, const Vec3 value2)
 {
     return value1.x() * value2.x() + value1.y() * value2.y() + value1.z() * value2.z();
 }
+
 inline Vec3 cross(const Vec3 value1, const Vec3 value2)
 {
     return Vec3(value1.y() * value2.z() - value1.z() * value2.y(),
-                value1.x() * value2.z() - value1.z() * value2.x(),
+                value1.z() * value2.x() - value1.x() * value2.z(),
                 value1.x() * value2.y() - value1.y() * value2.x());
 }
 

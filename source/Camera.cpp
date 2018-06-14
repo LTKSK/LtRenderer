@@ -8,7 +8,7 @@ Camera::Camera(Vec3 position, Vec3 direction, Vec3 up, double aspect_ratio, doub
 	:_position(position), _near_clip(near_clip)
 {
 	_x_axis = normalize(cross(direction, up)) * aspect_ratio;
-	_y_axis = normalize(cross(_x_axis, direction));
+	_y_axis = normalize(cross(direction, _x_axis));
 	_z_axis = direction;
 }
 Camera::~Camera() {};
