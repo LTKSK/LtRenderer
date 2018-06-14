@@ -91,7 +91,8 @@ bool Sphere::intersect(const Ray& ray, Intersection *intersection) const
 Triangle
 */
 
-Triangle::Triangle(const Vec3& vertex_a,
+Triangle::Triangle(
+	const Vec3& vertex_a,
 	const Vec3& vertex_b,
 	const Vec3& vertex_c,
 	Material* material) :
@@ -118,7 +119,7 @@ Triangle::Triangle(const Vec3& vertex_a,
 							 Vec3(min_x, min_y, min_z));
 
 	Vec3 cross_vec = cross(_edge_ab, _edge_ac);
-	_surface_area = cross_vec.length() / 2.0;
+	_surface_area = cross_vec.length() * 0.5;
 	_normal = normalize(cross_vec);
 }
 
@@ -154,67 +155,41 @@ Vec3 Triangle::randomPoint(Random* random) const
 	return _edge_ab * rnd + _edge_ab * (1.0 - rnd);
 }
 
-//行列式算出関数
-//クラメルの公式で、三角形上の交差位置を求める際に使用する
-//参考: https://shikousakugo.wordpress.com/2012/06/27/ray-intersection-2/
-/*
-具体的な公式は
-x + y + z = 9
-2x + 3y -2z = 5
-3x -y + z = 7
-という連立方程式があった際に、各変数の係数をベクトルとしてまとめて、
-(1, 2, 3)*x + (1,3,-1)*y + (1,-2,1)*z = (9,5,7)とする。この時xの係数をaとする。b,cも同様である
-x = det(d, b, c)/det(a, b, c)で求まる。
-
-*/
-double Triangle::det(Vec3 a, Vec3 b, Vec3 c) const
-{
-	return (a.x()*b.y()*c.z()) + (a.y()*b.z()*c.x()) + (a.z()*b.x()*c.y()) - (a.x()*b.z()*c.y()) - (a.y()*b.x()*c.z()) - (a.z()*b.y()*c.x());
-}
-
-/*
-三角形の当たり判定は、vertex0 + edgeA * u + edgeB * v = ray.org + ray.dir * tで求められる
-ここでedgeA,Bは、それぞれ三角形の一頂点であるvertex0から残り2つの頂点へと伸びた線分
-上記の式を、係数の無いものとあるもので整理すると、
-edgeA * u + edgeB * v - ray.dir * t = ray.org - vertex0
-ここで、係数u,v,tをクラメルの公式を使用して求める
-*/
 inline bool Triangle::intersect(const Ray& ray, Intersection *intersection) const
 {
-	//公式の関係で、rayは逆向き
-	Vec3 inv_raydir = normalize(Vec3(-ray.direction()));
-	
-	//(a,b,c)この後の計算の共通分母になる部分.
-	//a,b,cで作られる体積で、この後出て来る体積を割って、uvtを求める
-	double denominator = det(_edge_ab, _edge_ac, inv_raydir);
-	//レイが平面と並行でない場合
-	if (denominator > 0)
+	Vec3 p_vec = cross(ray.direction(), _edge_ac);
+	double det = dot(_edge_ab, p_vec);
+	if (fabs(det) <= 1e-8)
 	{
-		Vec3 vertex_a_pos = ray.origin() - _vertex_a;
-		//(d,b,c)
-		double u = det(vertex_a_pos, _edge_ac, inv_raydir) / denominator;
-		//uが範囲外だったら何もしない
-		if (0.0 <= u && u <= 1.0)
-		{
-			//(a,d,c)
-			double v = det(_edge_ab, vertex_a_pos, inv_raydir) / denominator;
-			if (0.0 <= v && u + v <= 1.0)
-			{
-				//(a,b,d)
-				double t = det(_edge_ab, _edge_ac, vertex_a_pos) / denominator;
-				if (t < 0.0 || t > intersection->t)
-				{
-					return false;
-				}
-				intersection->setNormal(_normal);
-				intersection->setPosition(ray.pointAtParameter(t));
-				intersection->setMaterial(material());
-				intersection->t = t;
-				return true;
-			}
-		}
+		return false;
 	}
-	return false;
+
+	double inv_det = 1.0 / det;
+	Vec3 t_vec = ray.origin() - _vertex_a;
+	double u = dot(t_vec, p_vec) * inv_det;
+	if (u < 0.0 || u > 1.0)
+	{
+		return false;
+	}
+
+	Vec3 q_vec = cross(t_vec, _edge_ab);
+	double v = dot(ray.direction(), q_vec) * inv_det;
+	if (v < 0.0 || u + v > 1.0)
+	{
+		return false;
+	}
+	
+	double t = dot(_edge_ac, q_vec) * inv_det;
+	if (t < 0.0 || t > intersection->t)
+	{
+		return false;
+	}
+
+	intersection->setNormal(_normal);
+	intersection->setPosition(ray.pointAtParameter(t));
+	intersection->setMaterial(material());
+	intersection->t = t;
+	return true;
 }
 
 }//namespace LtRenderer

@@ -56,7 +56,6 @@ public:
 	Vec3 position() const;
 	double surfaceArea() const;
 	Vec3 randomPoint(Random* random) const;
-	double det(Vec3 a, Vec3 b, Vec3 c) const;
 	bool intersect(const Ray& ray, Intersection *intersection) const;
 
 private:
