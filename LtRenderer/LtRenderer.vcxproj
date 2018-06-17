@@ -29,6 +29,7 @@
     <ClCompile Include="..\source\Mesh.cpp" />
     <ClCompile Include="..\source\ObjectLoadercpp.cpp" />
     <ClCompile Include="..\source\Scene.cpp" />
+    <ClCompile Include="..\source\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\BVH.h" />
@@ -45,6 +46,7 @@
     <ClInclude Include="..\include\Ray.h" />
     <ClInclude Include="..\include\Scene.h" />
     <ClInclude Include="..\include\Vector.h" />
+    <ClInclude Include="..\include\Vertex.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3C723927-4A87-4B56-A99B-3E196EB2E2A9}</ProjectGuid>

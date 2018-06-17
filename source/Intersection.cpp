@@ -6,10 +6,20 @@ namespace LtRenderer
 
 Intersection::Intersection() : _normal(Vec3()), _position(Vec3())
 {
-	t = D_HIT_MAX;
+	_distance = D_HIT_MAX;
 }
 
 Intersection::~Intersection() {}
+
+double Intersection::distance()
+{
+    return _distance;
+}
+
+void Intersection::setDistance(double distance)
+{
+    _distance = distance;
+}
 
 Vec3 Intersection::normal() const
 {
@@ -39,6 +49,16 @@ Material* Intersection::material() const
 void Intersection::setMaterial(Material* material)
 {
 	_material = material;
+}
+
+Vec2 Intersection::uv()
+{
+	return _uv;
+}
+
+void Intersection::setUv(Vec2 uv)
+{
+	_uv = uv;
 }
 
 }//namespace LtRenderer

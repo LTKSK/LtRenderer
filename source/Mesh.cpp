@@ -67,20 +67,20 @@ bool Sphere::intersect(const Ray& ray, Intersection *intersection) const
 		auto t1 = b - sqrt_det;
 		auto t2 = b + sqrt_det;
 		//t1,t2のいずれかが、衝突時の値が閾値より大きく、なおかつ既にhitしている他のobjectより小さい場合にtrue
-		if (t1 > D_HIT_MIN && intersection->t >= t1)
+		if (t1 > D_HIT_MIN && intersection->distance() >= t1)
 		{
 			intersection->setNormal(normalize(ray.pointAtParameter(t1) - _position));
 			intersection->setPosition(ray.pointAtParameter(t1));
 			intersection->setMaterial(_material);
-			intersection->t = t1;
+			intersection->setDistance(t1);
 			return true;
 		}
-		if (t2 > D_HIT_MIN && intersection->t >= t2)
+		if (t2 > D_HIT_MIN && intersection->distance() >= t2)
 		{
 			intersection->setNormal(normalize(ray.pointAtParameter(t2) - _position));
 			intersection->setPosition(ray.pointAtParameter(t2));
 			intersection->setMaterial(_material);
-			intersection->t = t2;
+			intersection->setDistance(t2);
 			return true;
 		}
 	}
@@ -92,29 +92,31 @@ Triangle
 */
 
 Triangle::Triangle(
-	const Vec3& vertex_a,
-	const Vec3& vertex_b,
-	const Vec3& vertex_c,
+	const Vertex& vertex_a,
+	const Vertex& vertex_b,
+	const Vertex& vertex_c,
 	Material* material) :
 	_vertex_a(vertex_a),
 	_vertex_b(vertex_b),
 	_vertex_c(vertex_c),
 	_material(material)
 {
-	_edge_ab = _vertex_b - _vertex_a;
-	_edge_ac = _vertex_c - _vertex_a;
-
-	_position = Vec3((_vertex_a.x() + _vertex_b.x() + _vertex_c.x()) / 3,
-					 (_vertex_a.y() + _vertex_b.y() + _vertex_c.y()) / 3,
-					 (_vertex_a.z() + _vertex_b.z() + _vertex_c.z()) / 3);
+    const Vec3 vertex_pos_a = _vertex_a.position();
+    const Vec3 vertex_pos_b = _vertex_b.position();
+    const Vec3 vertex_pos_c = _vertex_c.position();
+	_edge_ab = _vertex_b.position() - _vertex_a.position();
+	_edge_ac = _vertex_c.position() - _vertex_a.position();
+	_position = Vec3((vertex_pos_a.x() + vertex_pos_b.x() + vertex_pos_c.x()) / 3,
+					 (vertex_pos_a.y() + vertex_pos_b.y() + vertex_pos_c.y()) / 3,
+					 (vertex_pos_a.z() + vertex_pos_b.z() + vertex_pos_c.z()) / 3);
 
 	//三角形を構成する3頂点の各軸の最大最小からAABBを構築する
-	double max_x = std::fmax(_vertex_a.x(), std::fmax(_vertex_b.x(), _vertex_c.x()));
-	double max_y = std::fmax(_vertex_a.y(), std::fmax(_vertex_b.y(), _vertex_c.y()));
-	double max_z = std::fmax(_vertex_a.z(), std::fmax(_vertex_b.z(), _vertex_c.z()));
-	double min_x = std::fmin(_vertex_a.x(), std::fmin(_vertex_b.x(), _vertex_c.x()));
-	double min_y = std::fmin(_vertex_a.y(), std::fmin(_vertex_b.y(), _vertex_c.y()));
-	double min_z = std::fmin(_vertex_a.z(), std::fmin(_vertex_b.z(), _vertex_c.z()));
+	double max_x = std::fmax(vertex_pos_a.x(), std::fmax(vertex_pos_b.x(), vertex_pos_c.x()));
+	double max_y = std::fmax(vertex_pos_a.y(), std::fmax(vertex_pos_b.y(), vertex_pos_c.y()));
+	double max_z = std::fmax(vertex_pos_a.z(), std::fmax(vertex_pos_b.z(), vertex_pos_c.z()));
+	double min_x = std::fmin(vertex_pos_a.x(), std::fmin(vertex_pos_b.x(), vertex_pos_c.x()));
+	double min_y = std::fmin(vertex_pos_a.y(), std::fmin(vertex_pos_b.y(), vertex_pos_c.y()));
+	double min_z = std::fmin(vertex_pos_a.z(), std::fmin(vertex_pos_b.z(), vertex_pos_c.z()));
 	_bounding_box = new AABB(Vec3(max_x, max_y, max_z),
 							 Vec3(min_x, min_y, min_z));
 
@@ -165,7 +167,7 @@ inline bool Triangle::intersect(const Ray& ray, Intersection *intersection) cons
 	}
 
 	double inv_det = 1.0 / det;
-	Vec3 t_vec = ray.origin() - _vertex_a;
+	Vec3 t_vec = ray.origin() - _vertex_a.position();
 	double u = dot(t_vec, p_vec) * inv_det;
 	if (u < 0.0 || u > 1.0)
 	{
@@ -178,9 +180,9 @@ inline bool Triangle::intersect(const Ray& ray, Intersection *intersection) cons
 	{
 		return false;
 	}
-	
+
 	double t = dot(_edge_ac, q_vec) * inv_det;
-	if (t < 0.0 || t > intersection->t)
+	if (t < 0.0 || t > intersection->distance())
 	{
 		return false;
 	}
@@ -188,7 +190,9 @@ inline bool Triangle::intersect(const Ray& ray, Intersection *intersection) cons
 	intersection->setNormal(_normal);
 	intersection->setPosition(ray.pointAtParameter(t));
 	intersection->setMaterial(material());
-	intersection->t = t;
+	//TODO uv算出
+	intersection->setUv(Vec2(u, v));
+	intersection->setDistance(t);
 	return true;
 }
 

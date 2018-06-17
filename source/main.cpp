@@ -34,7 +34,7 @@ namespace LtRenderer{
                 //result += attenuation * scene.samplingIBL(scatterd_ray.direction());
                 break;
             }
-            
+
             if (intersection.material()->materialType() == nee_mat_name)
             {
                 result += attenuation * scene.nextEventEstimation(&intersection, random);
@@ -42,8 +42,8 @@ namespace LtRenderer{
 
             result += intersection.material()->emission() * attenuation;
             double russian_roulette_probability = max(intersection.material()->albedo().x(),
-                                                        max(intersection.material()->albedo().y(),
-                                                            intersection.material()->albedo().z()));
+                                                      max(intersection.material()->albedo().y(),
+                                                          intersection.material()->albedo().z()));
             if (depth > keep_depth)
             {
                 if (random->zeroToOneFloat() >= russian_roulette_probability)
@@ -58,6 +58,7 @@ namespace LtRenderer{
             scatterd_ray = intersection.material()->scatter(scatterd_ray,
                                                             intersection.position(),
                                                             intersection.normal(),
+                                                            intersection.uv(),
                                                             attenuation,
                                                             random);
             attenuation /= russian_roulette_probability;

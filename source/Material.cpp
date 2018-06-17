@@ -3,8 +3,18 @@
 
 namespace LtRenderer
 {
-Material::Material(Vec3& albedo, Vec3& emission) : _albedo(albedo), _emission(emission) {}
-Material::~Material() {}
+Material::Material(Vec3& albedo, Vec3& emission) : _albedo(albedo), _emission(emission)
+{
+	_albedo_texture = nullptr;
+}
+
+Material::~Material()
+{
+	if (_albedo_texture != nullptr)
+	{
+		delete _albedo_texture;
+	}
+}
 
 bool Material::isEmissive()
 {
@@ -21,6 +31,11 @@ Vec3 Material::emission()
 	return _emission;
 }
 
+void Material::setAlbedoTexture(Image* texture)
+{
+	_albedo_texture = texture;
+}
+
 Vec3 Material::orientingNormal(Ray ray, Vec3 normal) const
 {
 	return dot(normal, ray.direction()) < 0.0 ? normal : -normal;
@@ -34,7 +49,7 @@ Lambertion::Lambertion(Vec3& albedo, Vec3& emission) : Material(albedo, emission
 
 Lambertion::~Lambertion() {}
 
-Ray Lambertion::scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, Vec3& attenuation, Random* random) const
+Ray Lambertion::scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, const Vec2 uv, Vec3& attenuation, Random* random) const
 {
 	Vec3 orienting_normal = orientingNormal(ray, normal);
 	Vec3 u, v, w;
@@ -54,8 +69,15 @@ Ray Lambertion::scatter(const Ray& ray, const Vec3& hit_position, const Vec3& no
 
 	Vec3 diffuse_direction = normalize(u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1.0 - r2));
 
-	attenuation *= _albedo;
-	return Ray(hit_position + diffuse_direction * 0.01, diffuse_direction);
+	if (_albedo_texture != nullptr)
+    {
+        attenuation *= _albedo_texture->pixelFromUV(uv.x(), uv.y());
+    }
+    else
+    {
+	    attenuation *= _albedo;
+    }
+    return Ray(hit_position + diffuse_direction * 0.01, diffuse_direction);
 }
 
 std::string Lambertion::materialType() const
@@ -71,7 +93,7 @@ Metal::Metal(Vec3& albedo, Vec3& emission) : Material(albedo, emission) {}
 
 Metal::~Metal(){}
 
-Ray Metal::scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, Vec3& attenuation, Random* random) const
+Ray Metal::scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, const Vec2 uv, Vec3& attenuation, Random* random) const
 {
 	Vec3 reflect_direction = normalize(reflect(ray.direction(), normal));
 	attenuation *= _albedo;
@@ -91,7 +113,7 @@ Dielectric::Dielectric(Vec3& albedo, Vec3& emission, double ior) : Material(albe
 
 Dielectric::~Dielectric() {}
 
-Ray Dielectric::scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, Vec3& attenuation, Random* random) const
+Ray Dielectric::scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, const Vec2 uv, Vec3& attenuation, Random* random) const
 {
 	// rayが内側からオブジェクトに交差した場合にはnormalを反転させる
 	Vec3 orienting_normal = dot(normal, ray.direction()) < 0.0 ? normal : -normal;

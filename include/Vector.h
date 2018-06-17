@@ -4,6 +4,116 @@
 
 namespace LtRenderer
 {
+class Vec2
+{
+public:
+	Vec2()
+	{
+		_elements[0] = _elements[1]= 0.0;
+	}
+
+	Vec2(const double value)
+	{
+		_elements[0] = _elements[1] = value;
+	}
+
+	Vec2(double element0, double element1)
+	{
+		_elements[0] = element0;
+		_elements[1] = element1;
+	}
+
+	inline double x() const { return _elements[0]; }
+	inline double y() const { return _elements[1]; }
+	inline double operator [](int i) const
+	{
+		return _elements[i];
+	}
+
+	inline Vec2 operator - () const
+	{
+		return Vec2(-_elements[0], -_elements[1]);
+	}
+
+	inline Vec2 operator + (const Vec2& value) const
+	{
+		return Vec2(_elements[0] + value.x(), _elements[1] + value.y());
+	}
+	inline Vec2 operator - (const Vec2& value) const
+	{
+		return Vec2(_elements[0] - value.x(), _elements[1] - value.y());
+	}
+	inline Vec2 operator * (const Vec2& value) const
+	{
+		return Vec2(_elements[0] * value.x(), _elements[1] * value.y());
+	}
+	inline Vec2 operator / (const Vec2& value) const
+	{
+		return Vec2(_elements[0] / value.x(), _elements[1] / value.y());
+	}
+	inline Vec2 operator * (const double value) const
+	{
+		return Vec2(_elements[0] * value, _elements[1] * value);
+	}
+	inline Vec2 operator / (const double value) const
+	{
+		return Vec2(_elements[0] / value, _elements[1] / value);
+	}
+
+	inline Vec2& operator += (const Vec2 &value)
+	{
+		_elements[0] += value.x();
+		_elements[1] += value.y();
+		return *this;
+	}
+	inline Vec2& operator -= (const Vec2 &value)
+	{
+		_elements[0] -= value.x();
+		_elements[1] -= value.y();
+		return *this;
+	}
+	inline Vec2& operator *= (const Vec2 &value)
+	{
+		_elements[0] *= value.x();
+		_elements[1] *= value.y();
+		return *this;
+	}
+	inline Vec2& operator /= (const Vec2 &value)
+	{
+		_elements[0] /= value.x();
+		_elements[1] /= value.y();
+		return *this;
+	}
+	inline Vec2& operator *= (const double value)
+	{
+		_elements[0] *= value;
+		_elements[1] *= value;
+		return *this;
+	}
+	inline Vec2& operator /= (const double value)
+	{
+		_elements[0] /= value;
+		_elements[1] /= value;
+		return *this;
+	}
+
+	inline double length() const
+	{
+		return sqrt(_elements[0] * _elements[0] + _elements[1] * _elements[1]);
+	}
+private:
+	double _elements[2];
+};
+
+inline Vec2 operator * (const double value1, const Vec2& value2)
+{
+	return Vec2(value2.x() * value1, value2.y() * value1);
+}
+
+inline Vec2 normalize(const Vec2& value)
+{
+	return value / value.length();
+}
 
 class Vec3
 {

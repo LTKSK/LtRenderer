@@ -4,6 +4,7 @@
 #include "Material.h"
 #include "Intersection.h"
 #include "Collision.h"
+#include "Vertex.h"
 
 namespace LtRenderer
 {
@@ -46,9 +47,9 @@ private:
 class Triangle : public Mesh
 {
 public:
-    Triangle(const Vec3& vertex_a,
-             const Vec3& vertex_b,
-             const Vec3& vertex_c,
+    Triangle(const Vertex& vertex_a,
+             const Vertex& vertex_b,
+             const Vertex& vertex_c,
              Material* material);
     ~Triangle();
 	Material* material() const;
@@ -61,7 +62,7 @@ public:
 private:
 	Vec3 _position;
 	Vec3 _normal;
-	Vec3 _vertex_a, _vertex_b, _vertex_c;
+	Vertex _vertex_a, _vertex_b, _vertex_c;
 	Vec3 _color;
 	Vec3 _emission;
 	Vec3 _edge_ab, _edge_ac;

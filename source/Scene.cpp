@@ -8,7 +8,7 @@ Scene::Scene()
 {
 	auto loader = ObjectLoader();
 	_objects = loader.load();
-	_objects.push_back(new Sphere(Vec3(0.0, 20.0, 0.0), 2.5, new Lambertion(Vec3(0.0, 0.0, 0.0), Vec3(12))));
+	//_objects.push_back(new Sphere(Vec3(0.0, 20.0, 0.0), 2.5, new Lambertion(Vec3(0.0, 0.0, 0.0), Vec3(12))));
 	printf("BVH Build start\n");
 	_bvh = new BVH();
 	_bvh->build(_objects);
@@ -42,12 +42,6 @@ const auto Scene::randomLightObject(Random* random)
 
 bool Scene::intersectScene(const Ray& ray, Intersection* intersection)
 {
-	//bool is_hit = false;
-	//for (auto obj : _objects)
-	//{
-	//	is_hit |= obj->intersect(ray, intersection);
-	//}
-	//return is_hit;
 	return _bvh->intersect(ray, intersection);
 }
 

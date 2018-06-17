@@ -4,6 +4,7 @@
 #include "Random.h"
 #include "Constant.h"
 #include "MathLib.h"
+#include "Image.h"
 
 namespace LtRenderer
 {
@@ -17,13 +18,15 @@ public:
 	bool isEmissive();
 	Vec3 albedo();
 	Vec3 emission();
+	void setAlbedoTexture(Image* texture);
     // îΩéÀÇµÇΩRayÇï‘Ç∑ä÷êî.ïõçÏópÇ∆ÇµÇƒÅAattenuationÇ‡ìØéûÇ…åvéZÇ∑ÇÈ
-    virtual Ray scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, Vec3& attenuation, Random* random) const = 0;
+    virtual Ray scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, const Vec2 uv, Vec3& attenuation, Random* random) const = 0;
     virtual std::string materialType() const = 0;
 
 protected:
 	Vec3 _albedo;
 	Vec3 _emission;
+	Image* _albedo_texture;
 	Vec3 orientingNormal(Ray ray, Vec3 normal) const;
 };
 
@@ -32,9 +35,8 @@ class Lambertion : public Material
 public:
 	Lambertion(Vec3& albedo, Vec3& emission);
 	~Lambertion();
-
-	Ray scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, Vec3& attenuation, Random* random) const;
-	std::string materialType() const;
+	virtual Ray scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, const Vec2 uv, Vec3& attenuation, Random* random) const;
+	virtual std::string materialType() const;
 
 private:
 	const std::string _material_type = "Lambertion";
@@ -45,8 +47,8 @@ class Metal : public Material
 public:
 	Metal(Vec3& albedo, Vec3& emission);
 	~Metal();
-	Ray scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, Vec3& attenuation, Random* random) const;
-	std::string materialType() const;
+	virtual Ray scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, const Vec2 uv, Vec3& attenuation, Random* random) const;
+	virtual std::string materialType() const;
 
 private:
 	const std::string _material_type = "Metal";
@@ -57,9 +59,9 @@ class Dielectric : public Material
 public:
 	Dielectric(Vec3& albedo, Vec3& emission, double ior);
 	~Dielectric();
-	Ray scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, Vec3& attenuation, Random* random) const;
-	std::string materialType() const;
-
+	virtual Ray scatter(const Ray& ray, const Vec3& hit_position, const Vec3& normal, const Vec2 uv, Vec3& attenuation, Random* random) const;
+	virtual
+		std::string materialType() const;
 private:
 	double _ior;
 	const std::string _material_type = "Dierectric";
