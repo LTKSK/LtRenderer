@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 {
     int width   = 640;
     int height  = 480;
-    int samples = 128;
+    int samples = 512;
 
     LtRenderer::Scene scene;
     LtRenderer::Camera camera = LtRenderer::Camera(LtRenderer::Vec3(0.0, 13, 50),

@@ -194,7 +194,7 @@ inline bool Triangle::intersect(const Ray& ray, Intersection *intersection) cons
     auto uv_a = _vertex_a.uv();
     auto uv_ab = _vertex_b.uv() - uv_a;
     auto uv_ac = _vertex_c.uv() - uv_a;
-    auto uv = uv_ab*u + uv_ac*v;
+    auto uv = uv_a + uv_ab*u + uv_ac*v;
 
 	intersection->setUv(Vec2(uv.x(), uv.y()));
 	intersection->setDistance(t);
