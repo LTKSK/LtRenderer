@@ -60,7 +60,6 @@ std::map<std::string, Material *> ObjectLoader::_load_materials(std::string mate
 		if (splitted_str[0] == "map_Kd")
 		{
 			texture = ImageLoader().load("assets/"+splitted_str[1]);
-			name_material_map[name]->setAlbedoTexture(texture);
 		}
 		//ambient‚ÍŽg‚í‚È‚¢‚Ì‚Åemission‚Æ‚µ‚Ämap
 		if (splitted_str[0] == "Ka")
@@ -73,16 +72,21 @@ std::map<std::string, Material *> ObjectLoader::_load_materials(std::string mate
 		if (std::regex_search(name, std::regex("dielectric")))
 		{
 			name_material_map[name] = new Dielectric(diffuse, emission, 1.5);
-			continue;
 		}
-		if (std::regex_search(name, std::regex("metal")))
+		else if (std::regex_search(name, std::regex("metal")))
 		{
 			name_material_map[name] = new Metal(diffuse, emission);
-			continue;
 		}
-		//default‚Ílambert‚ðŽg‚¤‚æ‚¤‚É
-		name_material_map[name] = new Lambertion(diffuse, emission);
-
+        else
+        {
+            //default‚Ílambert‚ðŽg‚¤‚æ‚¤‚É
+            name_material_map[name] = new Lambertion(diffuse, emission);
+        }
+        if (texture == nullptr)
+        {
+            continue;
+        }
+        name_material_map[name]->setAlbedoTexture(texture);
 	}
 	return name_material_map;
 }
