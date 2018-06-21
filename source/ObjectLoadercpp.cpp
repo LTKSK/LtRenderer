@@ -95,8 +95,7 @@ std::vector<Mesh *> ObjectLoader::load()
 {
 	//Œ»ó‚Ítriangle‚Ì‚İ‘Î‰
 	std::vector<Mesh *> triangles;
-	std::ifstream ifs("assets/plate_with_texture.obj");
-	//std::ifstream ifs("assets/cornell_box.obj");
+	std::ifstream ifs("assets/cornell_box.obj");
 	if (ifs.fail())
 	{
 		std::cerr << "obj load failed!" << std::endl;
@@ -148,7 +147,6 @@ std::vector<Mesh *> ObjectLoader::load()
 			int face_vertex_index_1 = std::atoi(split(&splitted_str[1], '/')[0].c_str()) - 1;
 			int face_vertex_index_2 = std::atoi(split(&splitted_str[2], '/')[0].c_str()) - 1;
 			int face_vertex_index_3 = std::atoi(split(&splitted_str[3], '/')[0].c_str()) - 1;
-            // uv‚ÌˆÊ’u‚ğˆø‚Á’£‚é
 			int vertex_coordinate_index_1 = std::atoi(split(&splitted_str[1], '/')[1].c_str()) - 1;
 			int vertex_coordinate_index_2 = std::atoi(split(&splitted_str[2], '/')[1].c_str()) - 1;
 			int vertex_coordinate_index_3 = std::atoi(split(&splitted_str[3], '/')[1].c_str()) - 1;

@@ -71,7 +71,7 @@ Ray Lambertion::scatter(const Ray& ray, const Vec3& hit_position, const Vec3& no
 
 	if (_albedo_texture != nullptr)
     {
-		// imageクラスが左上原点のため、
+		// imageクラスが左上原点のため、vはひっくり返す
         attenuation *= _albedo_texture->pixelFromUV(uv.x(), 1.0-uv.y());
     }
     else
